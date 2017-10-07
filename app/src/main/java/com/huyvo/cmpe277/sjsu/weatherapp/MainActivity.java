@@ -1,6 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -24,7 +25,7 @@ public class MainActivity extends BaseActivityWithFragment{
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            VolleyLog.v("Response:%n %s", response.toString(4));
+                            Log.d("Response:%n %s", response.toString(4));
                         }catch(JSONException e) {
                             e.printStackTrace();
                         }
@@ -35,5 +36,7 @@ public class MainActivity extends BaseActivityWithFragment{
                 VolleyLog.e("Error: ", error.getMessage());
             }
         });
+
+        ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(req);
     }
 }
