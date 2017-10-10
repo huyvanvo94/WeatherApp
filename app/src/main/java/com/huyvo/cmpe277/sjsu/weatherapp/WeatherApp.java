@@ -21,7 +21,6 @@ public class WeatherApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // initialize the singleton
         mApplication = this;
     }
 
@@ -50,6 +49,12 @@ public class WeatherApp extends Application {
         }
 
         return mRequestQueue;
+    }
+
+    public void cancelPendingRequests() {
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(TAG);
+        }
     }
 
     public void cancelPendingRequests(Object tag) {
