@@ -5,6 +5,8 @@ package com.huyvo.cmpe277.sjsu.weatherapp;
  */
 
 public class PreferenceManager{
+
+    public PreferenceManager(){}
     
     public void saveLocation(){
 

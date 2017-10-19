@@ -4,29 +4,31 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A page adapter to hold cities
  */
 public class WeatherPageAdapter extends FragmentPagerAdapter {
-    private final static int SIZE = 2;
+    private List<WeatherFragment> mWFragments = new ArrayList<>();
+
+
 
     public WeatherPageAdapter(FragmentManager fm) {
         super(fm);
     }
 
+    public void add(WeatherFragment weatherFragment){
+        mWFragments.add(weatherFragment);
+    }
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-
-            default:
-                return WeatherFragment.newInstance(new WeatherModel());
-        }
+        return mWFragments.get(position);
     }
 
     @Override
     public int getCount() {
-        return SIZE;
+        return mWFragments.size();
     }
 }
