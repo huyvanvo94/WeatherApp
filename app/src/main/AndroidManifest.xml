@@ -12,10 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBMJSt7_3koa-jndHAzb6FYKleRAHtTpnY"/>
+            android:value="AIzaSyBMJSt7_3koa-jndHAzb6FYKleRAHtTpnY" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -28,6 +27,14 @@
             android:name=".CityListViewActivity"
             android:label="@string/title_activity_weather_city_list_view"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activities.BaseActivityWithFragment">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment" />
+        </activity>
     </application>
 
 </manifest>

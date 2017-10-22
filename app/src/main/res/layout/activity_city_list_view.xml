@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,21 +21,23 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:height="100dp"
-        android:text="+"
-        android:id="@+id/tester"/>
-
     <ListView
-        android:id="@+id/list_view"
+        android:layout_marginTop="50dp"
+        android:id="@+id/list_city_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:dividerHeight="0.1dp"
-        android:divider="#0000CC"
-        >
-    </ListView>
+        android:divider="#ffffff"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_add_white"/>
+
+
+</RelativeLayout>

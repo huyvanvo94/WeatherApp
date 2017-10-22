@@ -8,11 +8,4 @@ public class CityModel implements BaseModel {
     public String latlng;
 
 
-    public CityModel(String cityName, String localTime, String currentTemp, String latlng){
-        this.cityName = cityName;
-        this.localTime = localTime;
-        this.currentTemp = currentTemp;
-        this.latlng = latlng;
-    }
-
 }

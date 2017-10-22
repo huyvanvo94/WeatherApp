@@ -2,8 +2,8 @@ package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -18,36 +18,30 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 
-public class CityListViewActivity extends BaseActivityWithFragment {
+public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener{
     public final static String TAG = CityListViewActivity.class.getSimpleName();
 
-    private CityViewAdapter mListAdapter;
+    private CityViewAdapter mAdapter;
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather_city_list_view);
-        
+        setContentView(R.layout.activity_city_list_view);
+
+        FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
+        mFabAddCity.setOnClickListener(this);
+
         ArrayList<CityModel> cityModels = new ArrayList<>();
-        mListAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, cityModels);
+        mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, cityModels);
+        ListView listView = (ListView) findViewById(R.id.list_city_view);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setAdapter(mListAdapter);
-
-        Button b = (Button) findViewById(R.id.tester);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startCitySearch();
-            }
-        });
-
+        listView.setAdapter(mAdapter);
     }
 
 
-    private void startCitySearch(){
+    private void onCitySearch(){
 
         try{
             AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -73,18 +67,12 @@ public class CityListViewActivity extends BaseActivityWithFragment {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Logger.d(TAG, "Place: " + place.getLatLng());
 
-                mListAdapter.add(new CityModel(place.getAddress().toString(), "A", "B", "C"));
+                final double lat = place.getLatLng().latitude;
+                final double lng = place.getLatLng().longitude;
 
-                // test
-
-                double lat = place.getLatLng().latitude;
-                double lng = place.getLatLng().longitude;
-
-                /**
-                Intent intent = new Intent();
-                intent.putExtra("latlng", "lat="+lat+"&lon="+lng);
-                setResult(1, intent);
-                finish(); // finish activity */
+                CityModel cityModel = new CityModel();
+                cityModel.cityName = place.getAddress().toString();
+                mAdapter.add(cityModel);
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -97,4 +85,16 @@ public class CityListViewActivity extends BaseActivityWithFragment {
         }
     }
 
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.fab_add_city:
+                onCitySearch();
+                break;
+
+            default:
+                break;
+        }
+    }
 }

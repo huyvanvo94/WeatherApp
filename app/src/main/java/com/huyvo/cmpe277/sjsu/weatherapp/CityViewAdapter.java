@@ -31,8 +31,10 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_city_view, parent, false);
         }
 
-        TextView cityNameTextView = (TextView) convertView.findViewById(R.id.city_name);
-        cityNameTextView.setText(cityModel.cityName);
+        if(cityModel.cityName != null) {
+            TextView cityNameTextView = (TextView) convertView.findViewById(R.id.city_name);
+            cityNameTextView.setText(cityModel.cityName);
+        }
         return convertView;
     }
 
