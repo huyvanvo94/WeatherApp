@@ -16,7 +16,7 @@
 
     </LinearLayout>-->
     <android.support.v4.view.ViewPager
-        android:id="@+id/photos_viewpager"
+        android:id="@+id/city_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

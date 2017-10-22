@@ -8,6 +8,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.Volley;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Huy Vo on 10/5/17.
  */
@@ -17,6 +20,7 @@ public class WeatherApp extends Application {
     private static final String TAG = "WeatherApp";
     private static Application mApplication;
     private RequestQueue mRequestQueue;
+    private List<String> mLatLngList;
 
     @Override
     public void onCreate() {
@@ -38,14 +42,21 @@ public class WeatherApp extends Application {
 
     public <T> void addToRequestQueue(Request<T> req) {
         req.setTag(TAG);
-
         getRequestQueue().add(req);
     }
 
 
+    public List<String> getLatLngList(){
+        if(mLatLngList == null){
+            mLatLngList = new ArrayList<>();
+        }
+        return mLatLngList;
+    }
+
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+            mLatLngList = new ArrayList<>();
         }
 
         return mRequestQueue;

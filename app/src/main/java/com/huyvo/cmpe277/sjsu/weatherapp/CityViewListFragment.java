@@ -1,16 +1,17 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class WeatherCityViewListFragment extends Fragment {
+public class CityViewListFragment extends Fragment {
 
-    public WeatherCityViewListFragment() {
-        // Required empty public constructor
+    public CityViewListFragment() {
+
     }
 
     @Override
@@ -35,6 +36,11 @@ public class WeatherCityViewListFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     }
 }

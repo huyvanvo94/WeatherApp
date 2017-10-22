@@ -2,12 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.huyvo.cmpe277.sjsu.weatherapp.WeatherCityViewListFragment">
+    tools:context="com.huyvo.cmpe277.sjsu.weatherapp.CityViewListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:ems="10"
+        android:text="Enter City" />
 
 </FrameLayout>

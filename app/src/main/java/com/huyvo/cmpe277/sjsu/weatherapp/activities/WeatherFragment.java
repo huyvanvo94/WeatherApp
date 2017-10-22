@@ -6,19 +6,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 
 public class WeatherFragment extends Fragment {
     private View v;
-
-    private static int count = 0;
     private WeatherModel weatherModel;
+    private String name;
 
     public WeatherFragment() {
 
+    }
+
+    public static WeatherFragment newInstance(String name){
+        WeatherFragment weatherFragment = new WeatherFragment();
+        weatherFragment.name = name;
+        return weatherFragment;
     }
 
     public static WeatherFragment newInstance(WeatherModel model){
@@ -36,13 +40,7 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_weather, container, false);
-
-        TextView textView = (TextView) v.findViewById(R.id.text);
-        textView.setText("OK");
-        count++;
-
         return v;
     }
 
@@ -60,8 +58,13 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public interface WeatherFragmentEventListener{
-        void onItemClicked(WeatherModel weatherModel);
+    public void update(WeatherModel model){
+
+    }
+
+
+    public interface WeatherEventListener{
+        void update();
     }
 
 }

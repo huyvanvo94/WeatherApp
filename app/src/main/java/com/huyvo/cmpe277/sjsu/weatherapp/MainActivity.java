@@ -1,16 +1,14 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -21,11 +19,12 @@ import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends BaseActivityWithFragment{
+public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
 
     public final static String TAG = "MainActivity";
 
@@ -34,16 +33,21 @@ public class MainActivity extends BaseActivityWithFragment{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init();
+
 
     }
 
     private void init(){
-        ViewPager pager = (ViewPager) findViewById(R.id.photos_viewpager);
+
+        ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
+        pager.addOnPageChangeListener(this);
         PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(pager, true);
+
     }
 
     @Override
@@ -57,8 +61,8 @@ public class MainActivity extends BaseActivityWithFragment{
         switch (item.getItemId()) {
 
             case R.id.weather:
-
-                showFragment(R.id.contentPanel, WeatherFragment.newInstance(new WeatherModel()));
+                Intent i = new Intent(this, CityListViewActivity.class);
+                startActivityForResult(i, 1);
                 break;
 
             default:
@@ -68,18 +72,14 @@ public class MainActivity extends BaseActivityWithFragment{
         return true;
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo info){
-
-    }
-    private void createWeatherFragment(){
-
-    }
-
     private void fetchWeather(){
         final String URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=alameda&mode=json&units=imperial&cnt=7&appid=b54f500d4a53fdfc96813a4ba9210417";
 
         requestWeather(URL);
+    }
+
+    private void test_LatLngWeather(String location){
+        requestWeather("http://api.openweathermap.org/data/2.5/weather?"+location+"&appid=b54f500d4a53fdfc96813a4ba9210417");
     }
 
     private void requestWeather(String url){
@@ -92,8 +92,8 @@ public class MainActivity extends BaseActivityWithFragment{
 
                             WeatherModel model = JsonParser.parseWeather(response);
 
-                            Log.d("OK", model.toString());
-
+                            ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
+                            ((WeatherPageAdapter)pager.getAdapter()).add(new WeatherFragment());
                         }catch(JSONException e) {
                             e.printStackTrace();
                         }
@@ -106,26 +106,81 @@ public class MainActivity extends BaseActivityWithFragment{
         }));
     }
 
-    static class ActionBarCallBack implements ActionMode.Callback{
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Logger.d(TAG, "onPageSelected="+position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
+        super.onActivityResult(requestCode, resultCode, i);
+        // check if the request code is same as what is passed  here it is 2
+        if(requestCode==1) {
+            String location = i.getStringExtra("latlng");
+
+            if(location != null){
+                test_LatLngWeather(location);
+            }
+
+        }
+    }
+
+
+    private class WeatherTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            return false;
+        protected Void doInBackground(Void... voids) {
+            fetchWeather();
+            return null;
         }
 
-        @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return false;
+
+
+        private void fetchWeather(){
+            final String URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=alameda&mode=json&units=imperial&cnt=7&appid=b54f500d4a53fdfc96813a4ba9210417";
+
+            requestWeather(URL);
         }
 
-        @Override
-        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-            return false;
+        private void requestWeather(String url){
+            ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                Log.d("Response:%n %s", response.toString(4));
+
+                                WeatherModel model = JsonParser.parseWeather(response);
+
+                            }catch(JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    VolleyLog.e("Error: ", error.getMessage());
+                }
+            }));
         }
+    }
+
+
+    private class ForecastTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-
+        protected Void doInBackground(Void... voids) {
+            return null;
         }
     }
 }

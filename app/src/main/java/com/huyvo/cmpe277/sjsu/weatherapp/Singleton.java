@@ -5,5 +5,5 @@ package com.huyvo.cmpe277.sjsu.weatherapp;
  */
 
 public abstract class Singleton{
-
+    protected abstract void shutdown();
 }
