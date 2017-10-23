@@ -25,8 +25,6 @@ public class WeatherPageAdapter extends FragmentPagerAdapter {
     }
 
     public void add(WeatherFragment weatherFragment){
-        Log.d("WeatherPageAdapter", String.valueOf(index) +"|" +mWFragments.size());
-
         mWFragments.add(weatherFragment);
         notifyDataSetChanged();
     }

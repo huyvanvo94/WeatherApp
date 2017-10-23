@@ -1,7 +1,8 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.model.LatLngModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 
@@ -19,13 +20,33 @@ public class OpenWeatherDataService implements DataService{
 
     /*Can fetch weather using imperial or metric*/
     @Override
-    public void getWeather(LatLngModel latLng, FutureTaskListener<WeatherModel> listener) {
-        String url = "http://api.openweathermap.org/data/2.5/weather?"+latLng.toString()+
+    public void getWeatherByLatLng(String latLng,final FutureTaskListener<WeatherModel> listener) {
+        String url = "http://api.openweathermap.org/data/2.5/weather?"+latLng+
                 "&mode=json&units=imperial&cnt=7&appid=b54f500d4a53fdfc96813a4ba9210417";
+
+
+        mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
+            @Override
+            public void onCompletion(String result) {
+                Logger.e("OpenWeatherDataSercive", "result = " + result);
+                listener.onCompletion(JsonParser.parseWeather(result));
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                listener.onError(errorMessage);
+            }
+
+            @Override
+            public void onProgress(float progress) {
+
+            }}
+
+        );
     }
 
     @Override
-    public void getForecast(LatLngModel latLng, FutureTaskListener<WeatherModel> listener) {
+    public void getForecastByLatLng(String latLng, FutureTaskListener<WeatherModel> listener) {
 
         String url = "http://api.openweathermap.org/data/2.5/forecast?"+latLng.toString()+
                 "&mode=json&units=imperial&cnt=7&appid=b54f500d4a53fdfc96813a4ba9210417";

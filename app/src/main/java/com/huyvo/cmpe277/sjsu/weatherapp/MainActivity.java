@@ -24,6 +24,8 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
 
     public final static String TAG = "MainActivity";
@@ -35,11 +37,23 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
         init();
 
+        Intent i = getIntent();
+        String location = i.getStringExtra("latlon");
+        if(location != null){
+            List<String> locations = ((WeatherApp) WeatherApp.getInstance()).getLatLngList();
+            if(locations.contains(location)){
+                final int position = locations.indexOf(location);
+                ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
+                pager.setCurrentItem(position, true);
 
+            }else{
+                test_LatLngWeather(location);
+            }
+
+        }
     }
 
     private void init(){
-
         ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
         pager.addOnPageChangeListener(this);
         PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
@@ -47,7 +61,6 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(pager, true);
-
     }
 
     @Override
@@ -125,8 +138,8 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     protected void onActivityResult(int requestCode, int resultCode, Intent i) {
         super.onActivityResult(requestCode, resultCode, i);
         // check if the request code is same as what is passed  here it is 2
-        if(requestCode==1) {
-            String location = i.getStringExtra("latlng");
+        if(requestCode == 1) {
+            String location = i.getStringExtra("latlon");
 
             if(location != null){
                 test_LatLngWeather(location);

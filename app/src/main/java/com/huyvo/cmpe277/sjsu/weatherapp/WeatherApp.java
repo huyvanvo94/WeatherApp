@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.Volley;
 
 import java.util.ArrayList;
@@ -34,9 +33,6 @@ public class WeatherApp extends Application {
 
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
-
-        VolleyLog.d("Adding request to queue: %s", req.getUrl());
-
         getRequestQueue().add(req);
     }
 
