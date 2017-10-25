@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 
 public interface DataService {
-    void getForecastByLatLng(String location, FutureTaskListener<WeatherModel> listener);
+    void getForecastByLatLng(String location, final FutureTaskListener<ArrayList<WeatherModel>> listener);
     void getWeatherByLatLng(String location, FutureTaskListener<WeatherModel> listener);
     void getWeather(String location, FutureTaskListener<WeatherModel> listener);
     void getForecast(String location, FutureTaskListener<ArrayList<WeatherModel>> listener);

@@ -19,7 +19,7 @@ public class WeatherApp extends Application {
     private static final String TAG = "WeatherApp";
     private static Application mApplication;
     private RequestQueue mRequestQueue;
-    private List<String> mLatLngList;
+    private static List<String> mLatLngList;
 
     @Override
     public void onCreate() {
@@ -42,7 +42,8 @@ public class WeatherApp extends Application {
     }
 
 
-    public List<String> getLatLngList(){
+    public static List<String> getLatLngList(){
+
         if(mLatLngList == null){
             mLatLngList = new ArrayList<>();
         }
@@ -52,7 +53,6 @@ public class WeatherApp extends Application {
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(getApplicationContext());
-            mLatLngList = new ArrayList<>();
         }
 
         return mRequestQueue;

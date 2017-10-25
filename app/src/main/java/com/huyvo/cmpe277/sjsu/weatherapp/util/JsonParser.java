@@ -17,7 +17,7 @@ public class JsonParser {
         return jsonObject == null ? null : parseWeather(jsonObject);
     }
 
-    public static WeatherModel parseWeather(JSONObject jsonObject) {
+    public static WeatherModel parseWeather(JSONObject jsonObject){
         WeatherModel weatherModel = new WeatherModel();
         weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
         JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
@@ -31,9 +31,18 @@ public class JsonParser {
         weatherModel.minTemperature = (int) Math.round(JsonHelper.getDouble(mainObject, "temp_min"));
         weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(mainObject, "pressure"));
         weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(mainObject, "humidity"));
+        weatherModel.temp = (float) JsonHelper.getDouble(mainObject, "temp");
         JSONObject windObject = JsonHelper.getJSONObject(jsonObject, "wind");
         weatherModel.windSpeed = (float) JsonHelper.getDouble(windObject, "speed");
-        weatherModel.degree = (float) JsonHelper.getDouble(windObject, "deg");
+
+
+        JSONObject sysObject = JsonHelper.getJSONObject(jsonObject, "sys");
+        weatherModel.country = JsonHelper.getString(sysObject, "country");
+        weatherModel.city = JsonHelper.getString(jsonObject, "name");
+        JSONObject coorObjec = JsonHelper.getJSONObject(jsonObject, "coord");
+        weatherModel.lon = JsonHelper.getString(coorObjec, "lon");
+        weatherModel.lat = JsonHelper.getString(coorObjec, "lat");
+
         return weatherModel;
     }
 
@@ -52,7 +61,7 @@ public class JsonParser {
             weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(jsonObject, "pressure"));
             weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(jsonObject, "humidity"));
             weatherModel.windSpeed = (float) JsonHelper.getDouble(jsonObject, "speed");
-            weatherModel.degree = (float) JsonHelper.getDouble(jsonObject, "deg");
+            weatherModel.temp = (float) JsonHelper.getDouble(jsonObject, "deg");
             JSONObject tempObject = JsonHelper.getJSONObject(jsonObject, "temp");
             weatherModel.maxTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "max"));
             weatherModel.minTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "min"));

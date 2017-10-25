@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp;
+package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
 
 import java.util.List;

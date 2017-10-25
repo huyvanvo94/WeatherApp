@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WeatherApp</string>
     <string name="weather_api_key">b54f500d4a53fdfc96813a4ba9210417</string>
-    <string name="google_api_key">AIzaSyA2PCST7zR3haku3Faw1D0_tgBUw5gyEjY</string>
+    <string name="google_api_key">AIzaSyBMJSt7_3koa-jndHAzb6FYKleRAHtTpnY</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_city">Add City</string>
     <string name="title_activity_weather_city_list_view">WeatherCityListViewActivity</string>

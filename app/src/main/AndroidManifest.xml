@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CityListViewActivity"
+            android:name=".activities.CityListViewActivity"
             android:label="@string/title_activity_weather_city_list_view"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

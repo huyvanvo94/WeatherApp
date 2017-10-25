@@ -1,4 +1,5 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.util;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -7,10 +8,22 @@ import java.util.TimeZone;
  */
 
 public class DateHelper {
-    private DateHelper() {
+    private DateHelper() {}
 
+
+    public static long getTimeStamp(){
+        return System.currentTimeMillis() / 1000L;
     }
 
+    public static String getLocalTime(long unixTime, String format){
+
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        sdf.setTimeZone(TimeZone.getTimeZone(format));
+
+        String localTime = sdf.format(new Date(unixTime * 1000));
+        return localTime;
+
+    }
     public static String getDate(long unixTime, String gmtTime, String dateFormat) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(gmtTime));

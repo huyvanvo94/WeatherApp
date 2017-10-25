@@ -14,9 +14,15 @@ public class WeatherModel implements BaseModel {
     public int humidity;
     public int pressure;
     public float windSpeed;
-    public float degree;
+    public float temp;
     public String main;
     public String icon;
+
+    public String country;
+    public String city;
+    public String lat;
+    public String lon;
+
 
     public String getDate() {
         return DateHelper.getDate(dt, "GMT-4", "MMM d");
@@ -30,6 +36,6 @@ public class WeatherModel implements BaseModel {
     public String toString() {
         return "dt = " + dt + "\nmaxTemperature = " + maxTemperature + "\nminTemperature = " + minTemperature
                 + "\nicon = " + icon + "\nhumidity = " + humidity + "\nPressure = " + pressure + "\nwindSpeed = "
-                + windSpeed + "\ndegree = " + degree;
+                + windSpeed + "\ntemp = " + temp;
     }
 }

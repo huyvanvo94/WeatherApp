@@ -1,5 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
+import android.util.Log;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -38,6 +40,7 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
 
     @Override
     public void getString(String url, String tag, FutureTaskListener<String> listener) {
+        Log.d("Volley", "getString");
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new VolleyResponseListener<>(listener), new VolleyErrorListener<>(listener));
         startRequest(stringRequest, tag);

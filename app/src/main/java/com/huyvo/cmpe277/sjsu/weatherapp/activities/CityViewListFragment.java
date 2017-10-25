@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp;
+package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +17,7 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 

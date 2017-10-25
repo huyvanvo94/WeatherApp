@@ -2,9 +2,10 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
 import android.util.Log;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.CityListViewActivity;
-import com.huyvo.cmpe277.sjsu.weatherapp.CityViewListFragment;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityViewListFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +20,8 @@ public final class Logger {
     private static final List<String> CLASS_SIMPLE_NAMES = Arrays.asList(
             MainActivity.TAG,
             CityListViewActivity.TAG,
-            CityViewListFragment.TAG
+            CityViewListFragment.TAG,
+            WeatherFragment.TAG
     );
 
     public static void d(String tag, String msg) {

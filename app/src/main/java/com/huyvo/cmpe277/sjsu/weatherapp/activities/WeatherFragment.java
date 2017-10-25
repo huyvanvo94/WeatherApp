@@ -9,23 +9,20 @@ import android.view.ViewGroup;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 public class WeatherFragment extends Fragment {
+    public static final String TAG = "WeatherFragment";
+
     private View v;
     private WeatherModel weatherModel;
-    private String name;
-
+    
     public WeatherFragment() {
 
     }
 
-    public static WeatherFragment newInstance(String name){
-        WeatherFragment weatherFragment = new WeatherFragment();
-        weatherFragment.name = name;
-        return weatherFragment;
-    }
-
     public static WeatherFragment newInstance(WeatherModel model){
+        Logger.d(TAG, model.city);
         WeatherFragment weatherFragment = new WeatherFragment();
         weatherFragment.weatherModel = model;
         return weatherFragment;

@@ -32,6 +32,22 @@ public final class JsonHelper
         return null;
     }
 
+    public static String getString(JSONObject jsonObject, String key){
+        try
+        {
+            return jsonObject.getString(key);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        catch (NullPointerException e)
+        {
+           return null;
+        }
+
+        return null;
+    }
     public static double getDouble(JSONObject jsonObject, String key)
     {
         try
