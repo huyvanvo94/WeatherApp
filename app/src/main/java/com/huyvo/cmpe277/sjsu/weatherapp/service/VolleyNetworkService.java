@@ -67,6 +67,7 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
         @Override
         public void onResponse(T response) {
             Logger.e("VolleyResponseListener", "onResponse");
+            Log.d("VolleyResponseListener", response.toString());
             mListener.onCompletion(response);
         }
     }

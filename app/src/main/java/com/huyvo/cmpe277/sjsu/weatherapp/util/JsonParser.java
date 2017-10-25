@@ -1,5 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
+import android.util.Log;
+
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 
 import org.json.JSONArray;
@@ -46,6 +48,33 @@ public class JsonParser {
         return weatherModel;
     }
 
+    public static ArrayList<WeatherModel> newParseForecast(String jsonObjectString) {
+        ArrayList<WeatherModel> weatherModels = new ArrayList<>();
+        JSONArray weatherJsonArray = JsonHelper.getJSONArray(JsonHelper.createJSONObject(jsonObjectString), "list");
+        int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
+
+        for (int i = 0; i < length; i++) {
+            Log.d("newParseForecast", i+"");
+            WeatherModel weatherModel = new WeatherModel();
+            JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
+            weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
+            weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(jsonObject, "humidity"));
+            weatherModel.windSpeed = (float) JsonHelper.getDouble(jsonObject, "speed");
+            weatherModel.degree = (float) JsonHelper.getDouble(jsonObject, "deg");
+            JSONObject tempObject = JsonHelper.getJSONObject(jsonObject, "temp");
+            weatherModel.maxTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "max"));
+            weatherModel.minTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "min"));
+            JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
+            weatherModel.main = JsonHelper.getString(weatherArray, 0, "main");
+            weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");
+            if (weatherModel.icon != null) {
+                weatherModel.icon = weatherModel.icon.substring(0, weatherModel.icon.length() - 1);
+            }
+            weatherModels.add(weatherModel);
+        }
+        return weatherModels;
+    }
+
     public static ArrayList<WeatherModel> parseForecast(String jsonObjectString) {
         ArrayList<WeatherModel> weatherModels = new ArrayList<>();
         JSONArray weatherJsonArray = JsonHelper.getJSONArray(JsonHelper.createJSONObject(jsonObjectString), "list");
@@ -61,10 +90,11 @@ public class JsonParser {
             weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(jsonObject, "pressure"));
             weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(jsonObject, "humidity"));
             weatherModel.windSpeed = (float) JsonHelper.getDouble(jsonObject, "speed");
-            weatherModel.temp = (float) JsonHelper.getDouble(jsonObject, "deg");
+            weatherModel.degree = (float) JsonHelper.getDouble(jsonObject, "deg");
             JSONObject tempObject = JsonHelper.getJSONObject(jsonObject, "temp");
             weatherModel.maxTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "max"));
             weatherModel.minTemperature = (int) Math.round(JsonHelper.getDouble(tempObject, "min"));
+            weatherModel.day = (float) JsonHelper.getDouble(tempObject, "day");
             JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
             weatherModel.main = JsonHelper.getString(weatherArray, 0, "main");
             weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");

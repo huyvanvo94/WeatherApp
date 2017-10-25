@@ -11,16 +11,23 @@ import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class WeatherFragment extends Fragment {
     public static final String TAG = "WeatherFragment";
 
     private View v;
     private WeatherModel weatherModel;
+    private List<WeatherModel> mFiveDaysForecastList;
     
     public WeatherFragment() {
 
     }
 
+    public static WeatherFragment newInstance(WeatherModel weatherModel, ArrayList<WeatherModel> fiveDaysForecastList){
+        return null;
+    }
     public static WeatherFragment newInstance(WeatherModel model){
         Logger.d(TAG, model.city);
         WeatherFragment weatherFragment = new WeatherFragment();
@@ -37,7 +44,7 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_weather, container, false);
+        v = inflater.inflate(R.layout.fragment_weather, container, false);
         return v;
     }
 
@@ -55,7 +62,19 @@ public class WeatherFragment extends Fragment {
 
     }
 
+    public WeatherModel getWeatherModel(){
+        return weatherModel;
+    }
+
+    public void setFiveDaysForecastView(List<WeatherModel> fiveDaysForecastList){
+
+    }
+
     public void update(WeatherModel model){
+
+    }
+
+    public void setTodayView(WeatherModel model){
 
     }
 

@@ -131,9 +131,9 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long l) {
         Logger.d(TAG, "onItemClick");
-        CityModel cityModel = (CityModel) adapter.getItemAtPosition(position);
+        //CityModel cityModel = (CityModel) adapter.getItemAtPosition(position);
         Intent i = new Intent(this, MainActivity.class);
-        i.putExtra("latlon", cityModel.latlng);
+        i.putExtra("position", position);
         startActivity(i);
     }
 

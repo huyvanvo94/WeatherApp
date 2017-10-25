@@ -1,7 +1,15 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
+import android.location.Address;
+import android.location.Geocoder;
+
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 /**
  * Created by Huy Vo on 10/9/17.
@@ -10,6 +18,16 @@ import java.util.TimeZone;
 public class DateHelper {
     private DateHelper() {}
 
+    public static String getCity(double lat, double lng) throws IOException {
+        Geocoder gcd = new Geocoder(WeatherApp.getInstance().getApplicationContext(), Locale.getDefault());
+        List<Address> addresses = gcd.getFromLocation(lat, lng, 1);
+        if (addresses.size() > 0) {
+           return addresses.get(0).getLocality();
+        }
+        else {
+            return null;
+        }
+    }
 
     public static long getTimeStamp(){
         return System.currentTimeMillis() / 1000L;

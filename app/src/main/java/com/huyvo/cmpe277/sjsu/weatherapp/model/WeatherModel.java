@@ -15,8 +15,10 @@ public class WeatherModel implements BaseModel {
     public int pressure;
     public float windSpeed;
     public float temp;
+    public float day;
     public String main;
     public String icon;
+    public float degree;
 
     public String country;
     public String city;
