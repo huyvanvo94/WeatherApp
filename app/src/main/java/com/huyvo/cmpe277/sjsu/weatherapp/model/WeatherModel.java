@@ -38,6 +38,6 @@ public class WeatherModel implements BaseModel {
     public String toString() {
         return "dt = " + dt + "\nmaxTemperature = " + maxTemperature + "\nminTemperature = " + minTemperature
                 + "\nicon = " + icon + "\nhumidity = " + humidity + "\nPressure = " + pressure + "\nwindSpeed = "
-                + windSpeed + "\ntemp = " + temp;
+                + windSpeed + "\ntemp = " + temp +"\nday = " + day;
     }
 }

@@ -1,21 +1,15 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
@@ -24,18 +18,18 @@ import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
 
     public final static String TAG = "MainActivity";
+
+    private int mPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,41 +37,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         setContentView(R.layout.activity_main);
         Logger.d(TAG, "onCreate");
 
-        //initUI();
-        //load(WeatherApp.getLatLngList());
+        initUI();
 
-        loadTester();
+        Intent i = getIntent();
+        mPosition = i.getIntExtra("position", -1);
+        Logger.d(TAG, "mPosition= "+mPosition);
 
+
+
+        load(WeatherApp.getLatLngList());
     }
 
-    public void loadTester(){
-
-        if(true){
-            String location = "lat=37.7652065&lon=-122.2416355";
-
-            DataService service = new OpenWeatherDataService();
-            service.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
-                @Override
-                public void onCompletion(ArrayList<WeatherModel> result) {
-
-                    for(WeatherModel weatherModel:result){
-                        Logger.d(TAG, weatherModel.day +" ");
-                    }
-
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
-        }
-    }
 
     public void setCurrentItem(int position){
         ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
@@ -91,10 +61,8 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         }
     }
     private void load(List<String> locations){
-
         if(!locations.isEmpty()){
-            load(locations.get(0));
-            new Thread(new LoadWeatherRunnable(locations)).start();
+            new Thread(new LoadManyWeatherForecastRunnable(locations)).start();
         }
     }
 
@@ -129,65 +97,16 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         return true;
     }
 
-    private void fetchWeather(String location){
-
-        DataService dataService = new OpenWeatherDataService();
-        dataService.getWeatherByLatLng(location, new FutureTaskListener<WeatherModel>() {
-            @Override
-            public void onCompletion(WeatherModel result) {
-                Logger.d(TAG, result.toString());
-                ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
-                ((WeatherPageAdapter)pager.getAdapter()).add(WeatherFragment.newInstance(result));
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-
-            }
-
-            @Override
-            public void onProgress(float progress) {
-
-            }
-        });
-    }
-
-    private void test_LatLngWeather(String location){
-        requestWeather("http://api.openweathermap.org/w"+location+"&appid=b54f500d4a53fdfc96813a4ba9210417");
-    }
-
-    private void requestWeather(String url){
-        ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            Log.d("Response:%n %s", response.toString(4));
-
-                            WeatherModel model = JsonParser.parseWeather(response);
-
-                            ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
-                            ((WeatherPageAdapter)pager.getAdapter()).add(new WeatherFragment());
-                        }catch(JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.e("Error: ", error.getMessage());
-            }
-        }));
-    }
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
 
     }
 
     @Override
     public void onPageSelected(int position) {
         Logger.d(TAG, "onPageSelected="+position);
+
     }
 
     @Override
@@ -195,72 +114,10 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent i) {
-        super.onActivityResult(requestCode, resultCode, i);
-        Logger.d(TAG, "onActivityResult");
-        // check if the request code is same as what is passed  here it is 2
-        if(requestCode == 1) {
-            String location = i.getStringExtra("latlon");
-
-            if(location != null){
-                test_LatLngWeather(location);
-            }
-
-        }
-    }
-
-
-    private class WeatherTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            fetchWeather();
-            return null;
-        }
-
-        private void fetchWeather(){
-            final String URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=alameda&mode=json&units=imperial&cnt=7&appid=b54f500d4a53fdfc96813a4ba9210417";
-
-            requestWeather(URL);
-        }
-
-        private void requestWeather(String url){
-            ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Log.d("Response:%n %s", response.toString(4));
-
-                                WeatherModel model = JsonParser.parseWeather(response);
-
-                            }catch(JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    VolleyLog.e("Error: ", error.getMessage());
-                }
-            }));
-        }
-    }
-
-
-    private class ForecastTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-    }
-
-
-    public static final int ADD = 1;
-
+    public static final int ADD         = 1;
+    public static final int ADD_EMPTY   = 2;
+    public static final int ADD_FORCAST = 3;
+    public static final int ADD_MANY = 4;
     class LoadEmptyWeatherRunnable implements Runnable{
 
         private int mLength;
@@ -272,11 +129,14 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public void run() {
 
             for(int j = 0; j < mLength; j++){
-                WeatherModel weatherModel = new WeatherModel();
                 Message message = mHandler.obtainMessage();
-                message.what = ADD;
-                message.obj = weatherModel;
+                message.what = ADD_EMPTY;
                 mHandler.sendMessage(message);
+            }
+
+
+            if(mPosition != -1){
+                new Thread(new LoadWeatherForecastRunnable(mPosition)).start();
             }
 
         }
@@ -325,13 +185,65 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         }
     }
 
-    class LoadWeatherForecastRunnable implements Runnable{
+    class Test_LoadMany implements Runnable, Postable{
 
+        private List<String> mLocations;
+
+        public Test_LoadMany(){
+            mLocations = WeatherApp.getLatLngList();
+        }
+        @Override
+        public void postMessage() {
+            Message msg = mHandler.obtainMessage();
+
+            msg.what = ADD_FORCAST;
+            mHandler.sendMessage(msg);
+        }
+
+        @Override
+        public void run() {
+
+        }
+        private void fetchForecast(String location){
+            DataService dataService = new OpenWeatherDataService();
+            dataService.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
+                @Override
+                public void onCompletion(ArrayList<WeatherModel> result) {
+                    if(result != null){
+
+                    }
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+
+                }
+
+                @Override
+                public void onProgress(float progress) {
+
+                }
+            });
+
+        }
+
+
+    }
+    /**
+     * Loads only one weather at a time
+     */
+    class LoadWeatherForecastRunnable implements Runnable, Postable{
         private String mLocation;
+        private ArrayList<WeatherModel> mResults;
+
+        public LoadWeatherForecastRunnable(int position){
+            mLocation = WeatherApp.getLatLngList().get(position);
+        }
 
         public LoadWeatherForecastRunnable(String location){
             mLocation = location;
         }
+
         @Override
         public void run() {
             fetchForecast(mLocation);
@@ -342,8 +254,82 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
             dataService.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
                 @Override
                 public void onCompletion(ArrayList<WeatherModel> result) {
-                    for(int i = 0; i< result.size(); i++){
-                        Logger.d(TAG, result.get(i).toString());
+                    if(result != null){
+                        mResults = result;
+                        postMessage();
+
+
+                    }
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+
+                }
+
+                @Override
+                public void onProgress(float progress) {
+
+                }
+            });
+
+        }
+
+        @Override
+        public void postMessage() {
+            Message message = mHandler.obtainMessage();
+            message.what = ADD_FORCAST;
+            message.obj = mResults;
+            mHandler.sendMessage(message);
+        }
+    }
+
+    /**
+     * A class to load weather in order. If it does matter.
+     */
+    class LoadManyWeatherForecastRunnable implements Runnable{
+
+        private Queue<String> mLocationsQueue;
+        private List<WeatherFragment> mFragments;
+
+        public LoadManyWeatherForecastRunnable(List<String> locations){
+            Logger.d(TAG, "size"+locations.size());
+
+            mFragments = new ArrayList<>();
+            mLocationsQueue = new LinkedList<>(locations);
+
+        }
+
+        @Override
+        public void run() {
+            fetchForecasts();
+        }
+
+        private void postMessage(){
+            Message msg = mHandler.obtainMessage();
+            msg.obj = mFragments;
+            msg.what = ADD_MANY;
+            mHandler.sendMessage(msg);
+        }
+
+        private void fetchForecasts(){
+            fetchForecast(mLocationsQueue.remove());
+        }
+        private void fetchForecast(String location){
+            DataService dataService = new OpenWeatherDataService();
+            dataService.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
+                @Override
+                public void onCompletion(ArrayList<WeatherModel> result) {
+                    if(result != null){
+                        WeatherFragment fragment = WeatherFragment.newInstance(result);
+                        mFragments.add(fragment);
+
+                        if(mLocationsQueue.size() == 0){
+                            postMessage();
+                        }else{
+                            fetchForecast(mLocationsQueue.remove());
+                        }
+
                     }
                 }
 
@@ -360,26 +346,59 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
         }
     }
-
     Handler mHandler = new Handler(){
-        public void handleMessage(android.os.Message msg) {
+        public void handleMessage(Message msg) {
 
             switch (msg.what){
                 case ADD:
-                    WeatherModel weatherModel = (WeatherModel) msg.obj;
-                    ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
-                    WeatherPageAdapter weatherPageAdapter = (WeatherPageAdapter) pager.getAdapter();
-                    weatherPageAdapter.add(WeatherFragment.newInstance(weatherModel));
-                    Intent i = getIntent();
-                    int position = i.getIntExtra("position", -1);
-                    if(position !=-1){
-                        setCurrentItem(position);
+                    WeatherFragment fragment = (WeatherFragment) msg.obj;
+                    ViewPager aPager = (ViewPager) findViewById(R.id.city_viewpager);
+                    WeatherPageAdapter anAdapter = (WeatherPageAdapter) aPager.getAdapter();
+                    anAdapter.add(fragment);
+                    int size = anAdapter.getCount();
+                    Logger.d(TAG, "adapter size"+size);
+                    if(mPosition < size){
+                        setCurrentItem(mPosition);
                     }
+
                     break;
+                case ADD_EMPTY:
+                    /**
+                    ViewPager aPager = (ViewPager) findViewById(R.id.city_viewpager);
+                    WeatherPageAdapter anAdapter = (WeatherPageAdapter) aPager.getAdapter();
+                    anAdapter.add(new WeatherFragment());*/
+                    break;
+
+                case ADD_FORCAST:
+                    List<WeatherModel> weatherModels = (List) msg.obj;
+                    int aLen = addToAdapter(WeatherFragment.newInstance(weatherModels));
+                    if(mPosition < aLen){
+                        setCurrentItem(mPosition);
+                    }
+
+                    break;
+                case ADD_MANY:
+                    List<WeatherFragment> fragments = (List) msg.obj;
+
+                    WeatherApp.getLatLngList();
+
+                    for(WeatherFragment f: fragments){
+                        addToAdapter(f);
+                    }
+
+                    setCurrentItem(mPosition);
+
                 default:
                     break;
             }
 
         }
     };
+
+    public int addToAdapter(WeatherFragment fragment){
+        ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
+        WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
+        wpa.add(fragment);
+        return wpa.getCount();
+    }
 }

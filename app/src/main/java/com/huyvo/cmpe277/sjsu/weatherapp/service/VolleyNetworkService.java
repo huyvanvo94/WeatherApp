@@ -1,7 +1,5 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
-import android.util.Log;
-
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,7 +9,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.huyvo.cmpe277.sjsu.weatherapp.Singleton;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
-import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 /**
  * Created by Huy Vo on 10/22/17.
@@ -40,7 +37,6 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
 
     @Override
     public void getString(String url, String tag, FutureTaskListener<String> listener) {
-        Log.d("Volley", "getString");
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new VolleyResponseListener<>(listener), new VolleyErrorListener<>(listener));
         startRequest(stringRequest, tag);
@@ -66,8 +62,6 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
 
         @Override
         public void onResponse(T response) {
-            Logger.e("VolleyResponseListener", "onResponse");
-            Log.d("VolleyResponseListener", response.toString());
             mListener.onCompletion(response);
         }
     }
@@ -81,7 +75,6 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Logger.e("VolleyResponseListener", "onError");
             mListener.onError(error.getMessage());
         }
     }

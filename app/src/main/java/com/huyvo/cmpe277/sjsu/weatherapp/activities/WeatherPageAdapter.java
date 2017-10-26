@@ -3,7 +3,6 @@ package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public class WeatherPageAdapter extends FragmentPagerAdapter {
     private List<WeatherFragment> mWFragments = new ArrayList<>();
-    private static int index = 0;
+    private int index = 0;
 
     public WeatherPageAdapter(FragmentManager fm) {
         super(fm);
@@ -25,12 +24,22 @@ public class WeatherPageAdapter extends FragmentPagerAdapter {
     }
 
     public void add(WeatherFragment weatherFragment){
-        mWFragments.add(weatherFragment);
+        if(mWFragments.contains(weatherFragment)){
+            replace(weatherFragment);
+        }else {
+            mWFragments.add(weatherFragment);
+            index++;
+        }
         notifyDataSetChanged();
+    }
+
+    public void replace(WeatherFragment weatherFragment){
+        mWFragments.set(index, weatherFragment);
     }
 
     public void remove(WeatherFragment weatherFragment){
         mWFragments.remove(weatherFragment);
+        index --;
         notifyDataSetChanged();
     }
 

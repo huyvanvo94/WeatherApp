@@ -92,8 +92,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-                Logger.d(TAG, "Place: " + place.getLatLng());
-
 
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
@@ -130,8 +128,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long l) {
-        Logger.d(TAG, "onItemClick");
-        //CityModel cityModel = (CityModel) adapter.getItemAtPosition(position);
+        Logger.d(TAG, "onItemClick " + position);
         Intent i = new Intent(this, MainActivity.class);
         i.putExtra("position", position);
         startActivity(i);
@@ -282,8 +279,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                                Logger.d(TAG, response.toString());
-
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
 
                                 fetchLocalTime(weatherModel.lat+","+weatherModel.lon);

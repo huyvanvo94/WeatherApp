@@ -51,13 +51,13 @@ public class OpenWeatherDataService implements DataService{
     @Override
     public void getForecastByLatLng(String latLng, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
 
-        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
+        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
 
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
                 ArrayList<WeatherModel> weatherModels = JsonParser.parseForecast(result);
-                Log.d("Size", weatherModels.size()+"");
+
                 if (result == null) {
                     listener.onError("Json error");
                 } else {
@@ -84,7 +84,8 @@ public class OpenWeatherDataService implements DataService{
 
     @Override
     public void getForecast(String location, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
-        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?q="+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
+        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + location
+                + "&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
         Logger.e("OpenWeatherDataService", "getForecast url = " + url);
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override

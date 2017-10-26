@@ -2,6 +2,7 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
 import android.util.Log;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityViewListFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
@@ -21,7 +22,8 @@ public final class Logger {
             MainActivity.TAG,
             CityListViewActivity.TAG,
             CityViewListFragment.TAG,
-            WeatherFragment.TAG
+            WeatherFragment.TAG,
+            WeatherApp.TAG
     );
 
     public static void d(String tag, String msg) {
