@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
-import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityViewListFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 

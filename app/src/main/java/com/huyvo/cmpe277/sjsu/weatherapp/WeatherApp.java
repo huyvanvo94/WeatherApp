@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,13 @@ public class WeatherApp extends Application {
         mApplication = this;
     }
 
+    @Override
+    public void onTerminate(){
+        super.onTerminate();
+    }
+
+
+
     public static synchronized Application getInstance() {
         return mApplication;
     }
@@ -44,11 +50,9 @@ public class WeatherApp extends Application {
 
 
     public static synchronized List<String> getLatLngList(){
-
         if(mLatLngList == null){
             mLatLngList = new ArrayList<>();
         }
-        Logger.d(TAG, mLatLngList.toString());
         return mLatLngList;
     }
 

@@ -35,6 +35,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment" />
         </activity>
+
+        <service
+            android:name=".FetchWeatherIntentService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

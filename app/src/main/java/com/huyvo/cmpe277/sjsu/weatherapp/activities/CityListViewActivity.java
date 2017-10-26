@@ -20,6 +20,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.huyvo.cmpe277.sjsu.weatherapp.FetchWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
@@ -65,7 +66,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             new Thread(new CitiesLoadRunnable(locations)).start();
 
         }
-
     }
 
     private void onCitySearch(){
@@ -97,8 +97,11 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 final double lng = place.getLatLng().longitude;
 
                 String location = "lat="+lat+"&lon="+lng;
-
                 if(!((WeatherApp) WeatherApp.getInstance()).getLatLngList().contains(location)){
+
+                    Intent intent = new Intent(this, FetchWeatherIntentService.class);
+                    intent.putExtra(FetchWeatherIntentService.FETCH_WEATHER, location);
+                    startService(intent);
                     ((WeatherApp) WeatherApp.getInstance()).getLatLngList().add(location);
                     new Thread(new CityLoadRunnable(location)).start();
                 }
@@ -225,6 +228,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             }));
         }
     }
+
     /**
      * load current local time of that city, city name, and current temperature.
      */

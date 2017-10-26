@@ -37,6 +37,10 @@ public class WeatherPageAdapter extends FragmentPagerAdapter {
         mWFragments.set(index, weatherFragment);
     }
 
+    public void replace(int index, WeatherFragment fragment){
+        mWFragments.set(index, fragment);
+    }
+
     public void remove(WeatherFragment weatherFragment){
         mWFragments.remove(weatherFragment);
         index --;

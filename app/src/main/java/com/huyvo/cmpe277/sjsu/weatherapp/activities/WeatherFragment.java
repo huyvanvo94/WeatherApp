@@ -79,8 +79,11 @@ public class WeatherFragment extends Fragment {
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){
         Logger.d(TAG, "setForecastView" + String.valueOf(v==null));
 
-        TextView textView = (TextView) v.findViewById(R.id.textview_city_name);
+        if(fiveDaysForecastList == null){
+            return;
+        }
 
+        TextView textView = (TextView) v.findViewById(R.id.textview_city_name);
 
         WeatherModel weatherModel = fiveDaysForecastList.get(0);
         String city = weatherModel.city;
