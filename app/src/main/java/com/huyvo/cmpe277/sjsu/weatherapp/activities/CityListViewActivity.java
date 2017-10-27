@@ -24,6 +24,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.FetchWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
@@ -78,9 +79,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     .build(this);
 
             startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-        }catch (GooglePlayServicesRepairableException e){
-
-        }catch (GooglePlayServicesNotAvailableException e){
+        }catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException ignored){
 
         }
     }
@@ -97,12 +96,11 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 final double lng = place.getLatLng().longitude;
 
                 String location = "lat="+lat+"&lon="+lng;
-                if(!((WeatherApp) WeatherApp.getInstance()).getLatLngList().contains(location)){
-
+                if(!WeatherApp.getLatLngList().contains(location)){
                     Intent intent = new Intent(this, FetchWeatherIntentService.class);
                     intent.putExtra(FetchWeatherIntentService.FETCH_WEATHER, location);
                     startService(intent);
-                    ((WeatherApp) WeatherApp.getInstance()).getLatLngList().add(location);
+                    WeatherApp.getLatLngList().add(location);
                     new Thread(new CityLoadRunnable(location)).start();
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
@@ -110,9 +108,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
                 Logger.d(TAG, status.getStatusMessage());
 
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-            }
+            } else if (resultCode == RESULT_CANCELED) {}
         }
     }
 
@@ -141,11 +137,23 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         mAdapter.add(model);
     }
 
+    private void remove(String location){
+        WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
+        weatherForecastContainer.remove(location);
+    }
+
 
     class CityRemoveRunnable implements Runnable{
 
+        private String mLocation;
+        public CityRemoveRunnable(String location){
+            mLocation = location;
+        }
         @Override
         public void run() {
+
+            WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
+            weatherForecastContainer.remove(mLocation);
 
         }
     }
@@ -173,9 +181,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                         public void onResponse(JSONObject response) {
                             try {
                                 Logger.d(TAG, response.toString());
-
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
-
                                 fetchLocalTime(weatherModel.lat+","+weatherModel.lon);
 
                                 CityModel model = new CityModel();

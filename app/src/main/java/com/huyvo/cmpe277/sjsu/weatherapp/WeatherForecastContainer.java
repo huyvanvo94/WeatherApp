@@ -53,6 +53,9 @@ public class WeatherForecastContainer {
         return false;
     }
 
+    public void remove(String location){
+        mfHashMap.remove(location);
+    }
 
     class WeatherForecastPackage{
 
