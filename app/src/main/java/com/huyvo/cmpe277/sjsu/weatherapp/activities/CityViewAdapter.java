@@ -32,10 +32,24 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_city_view, parent, false);
         }
 
-        if(cityModel.cityName != null) {
-            TextView cityNameTextView = (TextView) convertView.findViewById(R.id.city_name);
-            cityNameTextView.setText(cityModel.cityName);
+        if(cityModel != null) {
+            if (cityModel.cityName != null) {
+                TextView cityNameTextView = (TextView) convertView.findViewById(R.id.city_name);
+                cityNameTextView.setText(cityModel.cityName);
+            }
+
+            if(cityModel.timeZoneId != null){
+                TextView cityTimeTextView = (TextView) convertView.findViewById(R.id.text_view_time);
+                cityTimeTextView.setText("Local Time: "+cityModel.getLocalTime());
+            }
+
+            if(cityModel.currentTemp != null){
+                TextView weatherTextView = (TextView) convertView.findViewById(R.id.text_view_weather);
+                weatherTextView.setText("Current temperature "+ cityModel.currentTemp);
+            }
+
         }
+
         return convertView;
     }
 

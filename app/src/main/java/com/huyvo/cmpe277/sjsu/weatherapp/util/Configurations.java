@@ -5,6 +5,13 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
  */
 
 public class Configurations {
-    public final static String API_KEY = "b54f500d4a53fdfc96813a4ba9210417";
+    public static boolean isImperial = true;
 
+    public static String getUnit(){
+        if(isImperial){
+            return "imperial";
+        }
+
+        return "metric";
+    }
 }

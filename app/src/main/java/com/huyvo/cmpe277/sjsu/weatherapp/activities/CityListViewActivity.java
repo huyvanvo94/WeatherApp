@@ -36,36 +36,49 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.ADD_CITY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.REMOVE_CITY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.UPDATE_CITY_TIME;
+import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.UPDATE_WEATHER;
 
 public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener, AdapterView.OnItemClickListener{
     public final static String TAG = CityListViewActivity.class.getSimpleName();
-
     private CityViewAdapter mAdapter;
+    private final List<CityModel> mCityModels = new ArrayList<>();
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_list_view);
-
         Logger.d(TAG, "onCreate");
 
+        initUI();
+        load(WeatherApp.getLatLngList());
+
+        ScheduledExecutorService executorService= Executors.newScheduledThreadPool(2);
+        executorService.scheduleAtFixedRate(new FetchLocalTime(), 0, 1, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FetchWeather(), 0, 10, TimeUnit.SECONDS);
+    }
+
+    private void initUI(){
         FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
-        ArrayList<CityModel> cityModels = new ArrayList<>();
-        mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, cityModels);
+
+        mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, mCityModels);
         ListView listView = (ListView) findViewById(R.id.list_city_view);
         listView.setAdapter(mAdapter);
         mFabAddCity.setOnClickListener(this);
         listView.setOnItemClickListener(this);
-
-        load(((WeatherApp) WeatherApp.getInstance()).getLatLngList());
     }
 
     private void load(List<String> locations){
         Logger.d(TAG, String.valueOf(locations.size()));
         if(!locations.isEmpty()) {
             new Thread(new CitiesLoadRunnable(locations)).start();
-
         }
     }
 
@@ -92,15 +105,20 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
 
+                Logger.d(TAG, place.toString());
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
                 String location = "lat="+lat+"&lon="+lng;
                 if(!WeatherApp.getLatLngList().contains(location)){
+                    WeatherApp.getLatLngList().add(location);
+
                     Intent intent = new Intent(this, FetchWeatherIntentService.class);
                     intent.putExtra(FetchWeatherIntentService.FETCH_WEATHER, location);
                     startService(intent);
-                    WeatherApp.getLatLngList().add(location);
+
+                    // update current view inside of waiting
+                    // for forecast fetching which will take relatively long
                     new Thread(new CityLoadRunnable(location)).start();
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
@@ -111,7 +129,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             } else if (resultCode == RESULT_CANCELED) {}
         }
     }
-
 
     @Override
     public void onClick(View view) {
@@ -133,8 +150,13 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         startActivity(i);
     }
 
-    private void appendCityModel(CityModel model){
+    private void append(CityModel model){
         mAdapter.add(model);
+     //   Logger.d(TAG, mCityModels.size()+"");
+    }
+
+    private void update(CityModel model){
+
     }
 
     private void remove(String location){
@@ -155,6 +177,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
             weatherForecastContainer.remove(mLocation);
 
+
         }
     }
 
@@ -168,30 +191,51 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         @Override
         public void run() {
             for(String location: mLocations){
-                fetchWeather(location);
+                WeatherForecastContainer forecastContainer = WeatherForecastContainer.getInstance();
+                WeatherModel weatherModel = forecastContainer.getWeatherModels(location).get(0);
+
+                CityModel cityModel = new CityModel();
+                cityModel.timeZoneId = weatherModel.timeZoneId;
+                cityModel.cityName = weatherModel.city;
+                cityModel.latlng = weatherModel.lat+","+weatherModel.lon;
+                cityModel.currentTemp = String.valueOf(weatherModel.temp_day);
+                cityModel.location = location;
+
+                Message msg = mHandler.obtainMessage();
+                msg.obj = cityModel;
+                msg.what = ADD_CITY;
+                mHandler.sendMessage(msg);
             }
         }
+    }
+
+    class FetchWeather implements Runnable{
 
 
-        private void fetchWeather(final String location){
-            String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
+        @Override
+        public void run(){
+            synchronized (mCityModels){
+                for (int i = 0; i < mCityModels.size(); i++){
+                    fetchWeather(mCityModels.get(i));
+                }
+            }
+
+        }
+
+        private void fetchWeather(final CityModel cityModel){
+
+            String url = "http://api.openweathermap.org/data/2.5/weather?"+cityModel.location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
             ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
-                                Logger.d(TAG, response.toString());
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
-                                fetchLocalTime(weatherModel.lat+","+weatherModel.lon);
 
-                                CityModel model = new CityModel();
-                                model.cityName = weatherModel.city;
-                                model.latlng = location;
+                                cityModel.currentTemp = String.valueOf(weatherModel.temp);
 
                                 Message msg = mHandler.obtainMessage();
-                                msg.what = ADD_CITY;
-                                msg.obj = model;
-
+                                msg.what = UPDATE_WEATHER;
                                 mHandler.sendMessage(msg);
 
                             }catch(Exception e) {
@@ -205,33 +249,21 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 }
             }));
         }
+    }
 
-        private void fetchLocalTime(String location){
 
-            String url = "https://maps.googleapis.com/maps/api/timezone/json?location="+location+"&timestamp="+DateHelper.getTimeStamp()+"&key=AIzaSyCLsOiLE8N82juTF3fljOupSenGI7Nb9Ro";
-            ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                Logger.d(TAG, response.toString());
+    class FetchLocalTime implements Runnable{
 
-                                String timeZoneId = JsonHelper.getString(response, "timeZoneId");
 
-                                //Logger.d(TAG, timeZoneId);
+        @Override
+        public void run() {
+            fetch();
+        }
 
-                                long unixTime = System.currentTimeMillis() / 1000L;
-                                Logger.d(TAG, DateHelper.getLocalTime(unixTime , timeZoneId));
-                            }catch(Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    VolleyLog.e("Error: ", error.getMessage());
-                }
-            }));
+        private void fetch(){
+            Message msg = mHandler.obtainMessage();
+            msg.what = UPDATE_CITY_TIME;
+            mHandler.sendMessage(msg);
         }
     }
 
@@ -240,23 +272,23 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
      */
     private class CityLoadRunnable implements Runnable{
 
-        private String location;
+        private String mLocation;
         public CityLoadRunnable(String location){
-            this.location = location;
+            mLocation = location;
         }
         @Override
         public void run() {
             Logger.d(TAG, "run");
-            load(location);
+            load(mLocation);
         }
 
         private void load(String location){
             fetchWeather(location);
         }
 
-        private void fetchLocalTime(String location){
+        private void fetchLocalTime(String location, final CityModel model){
 
-            String url = "https://maps.googleapis.com/maps/api/timezone/json?location="+location+"&timestamp="+DateHelper.getTimeStamp()+"&key=AIzaSyCLsOiLE8N82juTF3fljOupSenGI7Nb9Ro";
+            String url = "https://maps.googleapis.com/maps/api/timezone/json?location="+location+"&timestamp="+DateHelper.getTimeStamp()+"&key="+getString(R.string.google_timezone_key);
             ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -264,12 +296,10 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                             try {
                                 Logger.d(TAG, response.toString());
 
-                                String timeZoneId = JsonHelper.getString(response, "timeZoneId");
+                                model.timeZoneId = JsonHelper.getString(response, "timeZoneId");
+                                post(model);
 
-                                //Logger.d(TAG, timeZoneId);
 
-                                long unixTime = System.currentTimeMillis() / 1000L;
-                                Logger.d(TAG, DateHelper.getLocalTime(unixTime , timeZoneId));
                             }catch(Exception e) {
                                 e.printStackTrace();
                             }
@@ -291,17 +321,15 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                             try {
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
 
-                                fetchLocalTime(weatherModel.lat+","+weatherModel.lon);
 
                                 CityModel model = new CityModel();
                                 model.cityName = weatherModel.city;
-                                model.latlng = location;
+                                model.latlng = weatherModel.lat+","+weatherModel.lon;
+                                model.currentTemp = String.valueOf(weatherModel.temp);
+                                model.location = location;
 
-                                Message msg = mHandler.obtainMessage();
-                                msg.what = ADD_CITY;
-                                msg.obj = model;
+                                fetchLocalTime(weatherModel.lat+","+weatherModel.lon, model);
 
-                                mHandler.sendMessage(msg);
 
                             }catch(Exception e) {
                                 e.printStackTrace();
@@ -314,23 +342,58 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 }
             }));
         }
+
+        private void post(CityModel cityModel){
+            Message msg = mHandler.obtainMessage();
+            msg.what = ADD_CITY;
+            msg.obj = cityModel;
+
+            mHandler.sendMessage(msg);
+        }
     }
 
-    public final static int ADD_CITY    = 1;
-    public final static int REMOVE_CITY = 2;
-
+    public final class Messages{
+        public final static int ADD_CITY    = 1;
+        public final static int REMOVE_CITY = 2;
+        public final static int UPDATE_CITY_TIME = 3;
+        public final static int UPDATE_WEATHER = 4;
+    }
     Handler mHandler = new Handler(Looper.getMainLooper()){
         public void handleMessage(android.os.Message msg) {
 
             switch (msg.what){
                 case ADD_CITY:
                     CityModel model = (CityModel) msg.obj;
-                    appendCityModel(model);
+                    mCityModels.add(model);
+                    mAdapter.notifyDataSetChanged();
                     break;
+
+                case REMOVE_CITY:
+                    int index = (int) msg.obj;
+                    mCityModels.remove(index);
+                    mAdapter.notifyDataSetChanged();
+
+                    break;
+
+                case UPDATE_CITY_TIME:
+                    mAdapter.notifyDataSetChanged();
+                    break;
+                case UPDATE_WEATHER:
+                    Logger.d(TAG, "Update Weather");
+                    mAdapter.notifyDataSetChanged();
+                    break;
+
                 default:
                     break;
             }
 
         }
     };
+
+
+    class CityInfoPackage{
+        String location;
+        String localTime;
+        int index;
+    }
 }

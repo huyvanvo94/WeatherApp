@@ -2,10 +2,12 @@
     <string name="app_name">WeatherApp</string>
     <string name="weather_api_key">b54f500d4a53fdfc96813a4ba9210417</string>
     <string name="google_api_key">AIzaSyBMJSt7_3koa-jndHAzb6FYKleRAHtTpnY</string>
+    <string name="google_timezone_key">AIzaSyCYI2a3fQhifXLGvgZz2HJVhB0Vd8hvIaM</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_city">Add City</string>
     <string name="title_activity_weather_city_list_view">WeatherCityListViewActivity</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="timezonedb_api_key">C1G8BCH4TKGT</string>
 
     <!-- Strings related to Settings -->
 

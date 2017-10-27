@@ -56,8 +56,10 @@ public class OpenWeatherDataService implements DataService{
         mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
+               // Log.d("OpenWeather", result);
                 ArrayList<WeatherModel> weatherModels = JsonParser.parseForecast(result);
 
+                Log.d("OpenWeather", weatherModels.toString());
                 if (result == null) {
                     listener.onError("Json error");
                 } else {

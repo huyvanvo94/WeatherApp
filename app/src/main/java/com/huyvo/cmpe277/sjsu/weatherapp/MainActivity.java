@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import static com.huyvo.cmpe277.sjsu.weatherapp.MainActivity.Messages.ADD_EMPTY;
 import static com.huyvo.cmpe277.sjsu.weatherapp.MainActivity.Messages.ADD_MANY;
 import static com.huyvo.cmpe277.sjsu.weatherapp.MainActivity.Messages.ADD_ONCE_AT_A_TIME;
 
@@ -53,14 +52,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
             postFinishedListener = new PostForcastRunnable(mLocations);
             new Thread((Runnable) postFinishedListener).start();
 
-            /**
-            postFinishedListener = new LoadEmptyWeatherRunnable(mLocations.size());
-            new Thread((Runnable) postFinishedListener).start();
-
-            postFinishedListener = new LoadOnceAtATime(mLocations);
-            new Thread((Runnable) postFinishedListener).start();*/
         }
-
     }
 
 
@@ -146,6 +138,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     class PostForcastRunnable implements Runnable, PostFinishedListener, Postable{
         private Queue<String> mLocations;
         public PostForcastRunnable(List<String> locations){
+
             mLocations = new LinkedList<>(locations);
         }
 
@@ -166,48 +159,16 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                 WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
                 List<WeatherModel> weatherModels = weatherForecastContainer.getWeatherModels(location);
 
-                if(weatherModels != null) {
-                    Message message = mHandler.obtainMessage();
-                    message.obj = weatherModels;
-                    message.what = -1;
-                    mHandler.sendMessage(message);
-                }
+                Message message = mHandler.obtainMessage();
+                message.obj = weatherModels;
+                message.what = -1;
+                mHandler.sendMessage(message);
+
             }
         }
     }
-    class LoadEmptyWeatherRunnable implements Runnable, Postable, PostFinishedListener{
-
-        private int mLength;
-
-        public LoadEmptyWeatherRunnable(int length){
-            mLength = length;
-        }
-        @Override
-        public void run() {
-            for (int i =0 ; i<mLength;i++) {
-                postMessage();
-            }
 
 
-
-        }
-
-        @Override
-        public void postMessage() {
-            Message message = mHandler.obtainMessage();
-            message.what = ADD_EMPTY;
-            mHandler.sendMessage(message);
-        }
-
-        @Override
-        public void done() {
-            if(mLength != 0){
-                postMessage();
-                mLength--;
-            }
-
-        }
-    }
 
     class LoadForcastRunnable implements Runnable{
 

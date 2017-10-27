@@ -9,13 +9,19 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 public class WeatherModel implements BaseModel {
     public static final int NO_RESOURCE = -1;
     public long dt;
-    public int maxTemperature;
-    public int minTemperature;
+
     public int humidity;
     public int pressure;
     public float windSpeed;
+
+    public int temp_max;
+    public int temp_min;
     public float temp;
-    public float day;
+    public float temp_day;
+    public float temp_night;
+    public float temp_eve;
+    public float temp_morn;
+
     public String main;
     public String icon;
     public float degree;
@@ -24,6 +30,9 @@ public class WeatherModel implements BaseModel {
     public String city;
     public String lat;
     public String lon;
+    public String description;
+
+    public String timeZoneId;
 
 
     public String getDate() {
@@ -36,8 +45,26 @@ public class WeatherModel implements BaseModel {
 
     @Override
     public String toString() {
-        return "dt = " + dt + "\nmaxTemperature = " + maxTemperature + "\nminTemperature = " + minTemperature
-                + "\nicon = " + icon + "\nhumidity = " + humidity + "\nPressure = " + pressure + "\nwindSpeed = "
-                + windSpeed + "\ntemp = " + temp +"\nday = " + day;
+        return "WeatherModel{" +
+                "dt=" + dt +
+                ", humidity=" + humidity +
+                ", pressure=" + pressure +
+                ", windSpeed=" + windSpeed +
+                ", temp_max=" + temp_max +
+                ", temp_min=" + temp_min +
+                ", temp=" + temp +
+                ", temp_day=" + temp_day +
+                ", temp_night=" + temp_night +
+                ", temp_eve=" + temp_eve +
+                ", temp_morn=" + temp_morn +
+                ", main='" + main + '\'' +
+                ", icon='" + icon + '\'' +
+                ", degree=" + degree +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", lat='" + lat + '\'' +
+                ", lon='" + lon + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

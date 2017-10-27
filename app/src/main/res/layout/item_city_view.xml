@@ -11,4 +11,20 @@
         android:layout_gravity="center"
         android:textSize="30sp"
         android:textColor="#000"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/text_view_time"
+        android:textColor="#000"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/text_view_weather"
+        android:textColor="#000"
+        android:textSize="15sp"/>
 </LinearLayout>
