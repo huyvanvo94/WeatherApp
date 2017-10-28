@@ -25,8 +25,13 @@
         </activity>
         <activity
             android:name=".activities.CityListViewActivity"
-            android:label="@string/title_activity_weather_city_list_view"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_weather_city_list_view" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.huyvo.cmpe277.sjsu.weatherapp.MainActivity"
+                />
+       </activity>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"

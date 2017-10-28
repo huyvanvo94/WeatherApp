@@ -79,7 +79,7 @@ public class WeatherFragment extends Fragment {
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){
         Logger.d(TAG, "setForecastView" + String.valueOf(v==null));
 
-        if(fiveDaysForecastList == null){
+        if(fiveDaysForecastList == null || v == null){
             return;
         }
 
@@ -91,15 +91,6 @@ public class WeatherFragment extends Fragment {
             textView.setText(city);
         }
     }
-
-    public void update(WeatherModel model){
-
-    }
-
-    public void setTodayView(WeatherModel model){
-
-    }
-
 
     public interface WeatherEventListener{
         void update();

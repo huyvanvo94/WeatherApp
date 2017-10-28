@@ -7,19 +7,6 @@
     android:layout_height="match_parent"
     tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
 
     <ListView
         android:layout_marginTop="50dp"
@@ -29,12 +16,6 @@
         android:dividerHeight="0.1dp"
         android:divider="#ffffff"/>
 
-    <fragment
-        android:id="@+id/place_autocomplete_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-        />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_add_city"
         android:layout_width="wrap_content"

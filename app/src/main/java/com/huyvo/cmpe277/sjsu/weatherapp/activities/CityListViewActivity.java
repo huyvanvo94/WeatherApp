@@ -6,6 +6,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NavUtils;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -40,17 +44,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.ADD_CITY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.REMOVE_CITY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.UPDATE_CITY_TIME;
-import static com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity.Messages.UPDATE_WEATHER;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.ADD_CITY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.REMOVE_CITY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_CITY_TIME;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_WEATHER;
 
-public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener, AdapterView.OnItemClickListener{
+public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
     public final static String TAG = CityListViewActivity.class.getSimpleName();
     private CityViewAdapter mAdapter;
     private final List<CityModel> mCityModels = new ArrayList<>();
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
+    private ActionMode.Callback mCallback;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,19 +65,24 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         initUI();
         load(WeatherApp.getLatLngList());
 
-        ScheduledExecutorService executorService= Executors.newScheduledThreadPool(2);
-        executorService.scheduleAtFixedRate(new FetchLocalTime(), 0, 1, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new FetchWeather(), 0, 3, TimeUnit.HOURS);
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+        executorService.scheduleAtFixedRate(new FetchLocalTimePeriodically(), 0, 1, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
     }
 
     private void initUI(){
-        FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Cities");
 
+        mCallback = new ActionModeCallback();
+
+        FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
         mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, mCityModels);
         ListView listView = (ListView) findViewById(R.id.list_city_view);
         listView.setAdapter(mAdapter);
         mFabAddCity.setOnClickListener(this);
         listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
     }
 
     private void load(List<String> locations){
@@ -137,8 +147,23 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 onCitySearch();
                 break;
 
+
             default:
                 break;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+
+        switch (item.getItemId()){
+
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -164,6 +189,13 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         weatherForecastContainer.remove(location);
     }
 
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        Logger.d(TAG, "onItemLongClick");
+        startActionMode(mCallback);
+        return false;
+    }
 
     class CityRemoveRunnable implements Runnable{
 
@@ -209,7 +241,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     }
 
-    class FetchWeather implements Runnable{
+    class FetchWeatherPeriodically implements Runnable{
 
 
         @Override
@@ -252,9 +284,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
 
-    class FetchLocalTime implements Runnable{
-
-
+    class FetchLocalTimePeriodically implements Runnable{
         @Override
         public void run() {
             fetch();
@@ -352,12 +382,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     }
 
-    public final class Messages{
-        public final static int ADD_CITY    = 1;
-        public final static int REMOVE_CITY = 2;
-        public final static int UPDATE_CITY_TIME = 3;
-        public final static int UPDATE_WEATHER = 4;
-    }
+
     Handler mHandler = new Handler(Looper.getMainLooper()){
         public void handleMessage(android.os.Message msg) {
 
@@ -379,7 +404,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     mAdapter.notifyDataSetChanged();
                     break;
                 case UPDATE_WEATHER:
-                    Logger.d(TAG, "Update Weather");
                     mAdapter.notifyDataSetChanged();
                     break;
 
@@ -390,10 +414,27 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     };
 
+    class ActionModeCallback implements ActionMode.Callback{
 
-    class CityInfoPackage{
-        String location;
-        String localTime;
-        int index;
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            getMenuInflater().inflate(R.menu.content_menu_city_view, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+
+        }
     }
 }

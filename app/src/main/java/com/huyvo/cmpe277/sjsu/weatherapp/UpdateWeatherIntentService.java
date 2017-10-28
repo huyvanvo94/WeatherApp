@@ -45,7 +45,7 @@ public class UpdateWeatherIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable final Intent intent) {
-        Log.d("OK", "onHandleIntent");
+
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             final Messenger messenger = (Messenger) bundle.get(UPDATE);
@@ -75,7 +75,6 @@ public class UpdateWeatherIntentService extends IntentService {
                                                 Bundle b = intent.getExtras();
                                                 b.putString(LOCATION, location);
                                                 msg.setData(b);
-                                                Log.d("OK", "Yes!");
                                                 try {
                                                     messenger.send(msg);
                                                 } catch (RemoteException e) {

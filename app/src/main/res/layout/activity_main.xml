@@ -7,14 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.huyvo.cmpe277.sjsu.weatherapp.MainActivity">
 
-    <!--Container for fragments
-    <LinearLayout
-        android:id="@+id/contentPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
-    </LinearLayout>-->
     <android.support.v4.view.ViewPager
         android:id="@+id/city_viewpager"
         android:layout_width="match_parent"

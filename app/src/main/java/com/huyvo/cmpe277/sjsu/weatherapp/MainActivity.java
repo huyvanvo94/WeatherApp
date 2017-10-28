@@ -26,9 +26,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
 
@@ -42,7 +39,6 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Logger.d(TAG, "onCreate");
-
         initUI();
 
         Intent i = getIntent();
@@ -50,11 +46,12 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
         List<String> mLocations = WeatherApp.getLatLngList();
         if(!mLocations.isEmpty()){
-            postFinishedListener = new PostForcastRunnable(mLocations);
+            postFinishedListener = new PostForecastRunnable(mLocations);
             new Thread((Runnable) postFinishedListener).start();
+            /**
 
             ScheduledExecutorService executorService= Executors.newScheduledThreadPool(1);
-            executorService.scheduleAtFixedRate(new UpdateForcastRunnable(), 0, 3, TimeUnit.HOURS);
+            executorService.scheduleAtFixedRate(new UpdateForecastPeriodicallyRunnable(), 0, 2, TimeUnit.SECONDS);*/
         }
 
 
@@ -131,9 +128,9 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public static final int UPDATE_FORCAST = 6;
     }
 
-    class PostForcastRunnable implements Runnable, PostFinishedListener, Postable{
+    class PostForecastRunnable implements Runnable, PostFinishedListener, Postable{
         private Queue<String> mLocations;
-        public PostForcastRunnable(List<String> locations){
+        public PostForecastRunnable(List<String> locations){
 
             mLocations = new LinkedList<>(locations);
         }
@@ -152,22 +149,24 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public void postMessage() {
             if(!mLocations.isEmpty()) {
                 String location = mLocations.remove();
-                WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-                List<WeatherModel> weatherModels = weatherForecastContainer.getWeatherModels(location);
+                try {
+                    WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
+                    List<WeatherModel> weatherModels = weatherForecastContainer.getWeatherModels(location);
 
-                Message message = mHandler.obtainMessage();
-                message.obj = weatherModels;
-                message.what = -1;
-                mHandler.sendMessage(message);
+                    Message message = mHandler.obtainMessage();
+                    message.obj = weatherModels;
+                    message.what = -1;
+                    mHandler.sendMessage(message);
+                }catch (Exception e){}
 
             }
         }
     }
 
-    class UpdateForcastRunnable implements Runnable{
+    class UpdateForecastPeriodicallyRunnable implements Runnable{
 
 
-        public UpdateForcastRunnable(){
+        public UpdateForecastPeriodicallyRunnable(){
         }
 
         @Override
@@ -281,6 +280,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                 if(location != null){
                     WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
                     List<WeatherModel> models = weatherForecastContainer.getWeatherModels(location);
+
                     int position = WeatherApp.getLatLngList().indexOf(location);
                     replaceFragmentInAdapter(position, models);
 
@@ -336,10 +336,13 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                     replaceFragmentInAdapter(info.position, info.mList);
                     break;
                 default:
-                    int length = addToAdapter((List) msg.obj);
-                    postFinishedListener.done();
-                    if(length-1==mPosition){
-                        setCurrentItem(mPosition);
+                    if( msg.obj != null) {
+
+                        int length = addToAdapter((List) msg.obj);
+                        postFinishedListener.done();
+                        if (length - 1 == mPosition) {
+                            setCurrentItem(mPosition);
+                        }
                     }
 
                     break;
