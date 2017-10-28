@@ -79,36 +79,5 @@ public class OpenWeatherDataService implements DataService{
         });
 
     }
-    @Override
-    public void getWeather(String location, FutureTaskListener<WeatherModel> listener) {
 
-    }
-
-    @Override
-    public void getForecast(String location, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
-        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + location
-                + "&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
-        Logger.e("OpenWeatherDataService", "getForecast url = " + url);
-        mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
-            @Override
-            public void onCompletion(String result) {
-                ArrayList<WeatherModel> weatherModels = JsonParser.parseForecast(result);
-                if (result == null) {
-                    listener.onError("Json error");
-                } else {
-                    listener.onCompletion(weatherModels);
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                listener.onError(errorMessage);
-            }
-
-            @Override
-            public void onProgress(float progress) {
-
-            }
-        });
-    }
 }
