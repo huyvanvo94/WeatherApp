@@ -39,6 +39,9 @@
         <service
             android:name=".FetchWeatherIntentService"
             android:exported="false" />
+        <service
+            android:name=".UpdateWeatherIntentService"
+            android:exported="false"/>
 
     </application>
 

@@ -30,8 +30,8 @@ public class JsonParser {
             weatherModel.icon = weatherModel.icon.substring(0, weatherModel.icon.length() - 1);
         }
         JSONObject mainObject = JsonHelper.getJSONObject(jsonObject, "main");
-        weatherModel.temp_max = (int) Math.round(JsonHelper.getDouble(mainObject, "temp_max"));
-        weatherModel.temp_min = (int) Math.round(JsonHelper.getDouble(mainObject, "temp_min"));
+        weatherModel.temp_max = (float) JsonHelper.getDouble(mainObject, "temp_max");
+        weatherModel.temp_min = (float) JsonHelper.getDouble(mainObject, "temp_min");
 
         weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(mainObject, "pressure"));
         weatherModel.humidity = (int) Math.round(JsonHelper.getDouble(mainObject, "humidity"));
@@ -88,8 +88,8 @@ public class JsonParser {
             weatherModel.degree = (float) JsonHelper.getDouble(jsonObject, "deg");
 
             JSONObject tempObject = JsonHelper.getJSONObject(jsonObject, "temp");
-            weatherModel.temp_max = (int) Math.round(JsonHelper.getDouble(tempObject, "max"));
-            weatherModel.temp_min = (int) Math.round(JsonHelper.getDouble(tempObject, "min"));
+            weatherModel.temp_max = (float) JsonHelper.getDouble(tempObject, "max");
+            weatherModel.temp_min = (float) JsonHelper.getDouble(tempObject, "min");
             weatherModel.temp_day = (float) JsonHelper.getDouble(tempObject, "day");
             weatherModel.temp_night = (float) JsonHelper.getDouble(tempObject, "night");
             weatherModel.temp_eve = (float) JsonHelper.getDouble(tempObject, "eve");

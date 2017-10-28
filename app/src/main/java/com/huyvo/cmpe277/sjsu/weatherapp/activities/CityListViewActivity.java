@@ -62,7 +62,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
         ScheduledExecutorService executorService= Executors.newScheduledThreadPool(2);
         executorService.scheduleAtFixedRate(new FetchLocalTime(), 0, 1, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new FetchWeather(), 0, 10, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FetchWeather(), 0, 3, TimeUnit.HOURS);
     }
 
     private void initUI(){

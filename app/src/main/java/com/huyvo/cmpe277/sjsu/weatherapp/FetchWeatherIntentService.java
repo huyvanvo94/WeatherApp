@@ -41,8 +41,8 @@ public class FetchWeatherIntentService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Logger.d(TAG, "onHandleIntent");
         final String location = intent.getStringExtra(FETCH_WEATHER);
-        if(location != null){
 
+        if(location != null){
             DataService service = new OpenWeatherDataService();
             service.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
                 @Override
@@ -58,9 +58,7 @@ public class FetchWeatherIntentService extends IntentService {
                                     @Override
                                     public void onResponse(JSONObject response) {
                                         try {
-
                                             result.get(0).timeZoneId = JsonHelper.getString(response, "timeZoneId");
-
                                             WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
                                             weatherForecastContainer.put(location, result);
 

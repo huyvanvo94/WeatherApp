@@ -14,8 +14,8 @@ public class WeatherModel implements BaseModel {
     public int pressure;
     public float windSpeed;
 
-    public int temp_max;
-    public int temp_min;
+    public float temp_max;
+    public float temp_min;
     public float temp;
     public float temp_day;
     public float temp_night;
