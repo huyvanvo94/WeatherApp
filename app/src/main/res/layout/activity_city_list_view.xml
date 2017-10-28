@@ -7,9 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity">
 
-
     <ListView
-        android:layout_marginTop="50dp"
         android:id="@+id/list_city_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

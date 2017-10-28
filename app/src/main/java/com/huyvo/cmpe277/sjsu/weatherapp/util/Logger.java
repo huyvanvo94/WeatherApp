@@ -2,7 +2,7 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
 import android.util.Log;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.FetchWeatherIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
@@ -25,7 +25,7 @@ public final class Logger {
             WeatherFragment.TAG,
             WeatherApp.TAG,
             WeatherForecastContainer.TAG,
-            FetchWeatherIntentService.TAG
+            FetchForecastIntentService.TAG
     );
 
     public static void d(String tag, String msg) {

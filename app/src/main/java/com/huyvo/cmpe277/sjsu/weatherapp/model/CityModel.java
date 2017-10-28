@@ -20,11 +20,27 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
         return DateHelper.getLocalTime(unixTime, timeZoneId);
     }
 
+    public static CityModel makeFrom(WeatherModel weatherModel){
+        CityModel cityModel = new CityModel();
+        cityModel.timeZoneId = weatherModel.timeZoneId;
+        cityModel.cityName = weatherModel.city;
+        cityModel.latlng = weatherModel.lat+","+weatherModel.lon;
+        if(weatherModel.temp_day != 0.0){
+            cityModel.currentTemp = String.valueOf(weatherModel.temp_day);
+        }else{
+            cityModel.currentTemp = String.valueOf(weatherModel.temp);
+        }
+
+
+        cityModel.location = "lat="+weatherModel.lat+"&lon="+weatherModel.lon;
+        return cityModel;
+    }
+
     public String getCurrentTemp(){
         if(Configurations.isImperial){
-            return currentTemp + "F";
+            return currentTemp + " F";
         }
-        return currentTemp+"C";
+        return currentTemp+" C";
     }
 
     @Override

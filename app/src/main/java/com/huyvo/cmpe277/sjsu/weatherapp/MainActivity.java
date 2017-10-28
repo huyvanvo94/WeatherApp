@@ -175,9 +175,9 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
             List<String> locations = WeatherApp.getLatLngList();
 
             for(String location: locations) {
-                Intent intent = new Intent(MainActivity.this, UpdateWeatherIntentService.class);
-                intent.putExtra(UpdateWeatherIntentService.UPDATE, new Messenger(mHandler));
-                intent.putExtra(UpdateWeatherIntentService.LOCATION, location);
+                Intent intent = new Intent(MainActivity.this, UpdateForecastIntentService.class);
+                intent.putExtra(UpdateForecastIntentService.UPDATE, new Messenger(mHandler));
+                intent.putExtra(UpdateForecastIntentService.LOCATION, location);
                 startService(intent);
             }
         }
@@ -276,7 +276,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public void handleMessage(Message msg) {
             Bundle reply = msg.getData();
             if(reply != null){
-                String location = reply.getString(UpdateWeatherIntentService.LOCATION, null);
+                String location = reply.getString(UpdateForecastIntentService.LOCATION, null);
                 if(location != null){
                     WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
                     List<WeatherModel> models = weatherForecastContainer.getWeatherModels(location);

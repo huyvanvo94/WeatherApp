@@ -24,16 +24,16 @@ import java.util.ArrayList;
  * Created by Huy Vo on 10/26/17.
  */
 
-public class FetchWeatherIntentService extends IntentService {
+public class FetchForecastIntentService extends IntentService {
 
-    public final static String TAG = "FetchWeatherIntentService";
+    public final static String TAG = "FetchForecastIntentService";
 
     public final static String FETCH_WEATHER = "com.huyvo.cmpe277.weatherapp.fetch_weather";
 
-    public FetchWeatherIntentService(){
+    public FetchForecastIntentService(){
         this(TAG);
     }
-    public FetchWeatherIntentService(String name) {
+    public FetchForecastIntentService(String name) {
         super(name);
     }
 

@@ -42,11 +42,15 @@
         </activity>
 
         <service
-            android:name=".FetchWeatherIntentService"
+            android:name=".FetchForecastIntentService"
             android:exported="false" />
         <service
-            android:name=".UpdateWeatherIntentService"
+            android:name=".UpdateForecastIntentService"
             android:exported="false"/>
+        <service
+            android:name=".RemoveWeatherIntentService"
+            android:exported="false"
+            />
 
     </application>
 

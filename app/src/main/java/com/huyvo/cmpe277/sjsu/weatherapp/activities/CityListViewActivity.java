@@ -24,9 +24,10 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.huyvo.cmpe277.sjsu.weatherapp.FetchWeatherIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
+import com.huyvo.cmpe277.sjsu.weatherapp.RemoveWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
@@ -103,7 +104,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
             startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
         }catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException ignored){
-
         }
     }
 
@@ -114,8 +114,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-
                 Logger.d(TAG, place.toString());
+
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
@@ -123,8 +123,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
 
-                    Intent intent = new Intent(this, FetchWeatherIntentService.class);
-                    intent.putExtra(FetchWeatherIntentService.FETCH_WEATHER, location);
+                    Intent intent = new Intent(this, FetchForecastIntentService.class);
+                    intent.putExtra(FetchForecastIntentService.FETCH_WEATHER, location);
                     startService(intent);
 
                     // update current view inside of waiting
@@ -175,42 +175,11 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         startActivity(i);
     }
 
-    private void append(CityModel model){
-        mAdapter.add(model);
-     //   Logger.d(TAG, mCityModels.size()+"");
-    }
-
-    private void update(CityModel model){
-
-    }
-
-    private void remove(String location){
-        WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-        weatherForecastContainer.remove(location);
-    }
-
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-
         Logger.d(TAG, "onItemLongClick");
         startActionMode(mCallback);
         return false;
-    }
-
-    class CityRemoveRunnable implements Runnable{
-
-        private String mLocation;
-        public CityRemoveRunnable(String location){
-            mLocation = location;
-        }
-        @Override
-        public void run() {
-
-            WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-            weatherForecastContainer.remove(mLocation);
-
-
-        }
     }
 
     class CitiesLoadRunnable implements Runnable{
@@ -226,24 +195,19 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 WeatherForecastContainer forecastContainer = WeatherForecastContainer.getInstance();
                 WeatherModel weatherModel = forecastContainer.getWeatherModels(location).get(0);
 
-                CityModel cityModel = new CityModel();
-                cityModel.timeZoneId = weatherModel.timeZoneId;
-                cityModel.cityName = weatherModel.city;
-                cityModel.latlng = weatherModel.lat+","+weatherModel.lon;
-                cityModel.currentTemp = String.valueOf(weatherModel.temp_day);
-                cityModel.location = location;
+                CityModel cityModel = CityModel.makeFrom(weatherModel);
 
-                Message msg = mHandler.obtainMessage();
-                msg.obj = cityModel;
-                msg.what = ADD_CITY;
-                mHandler.sendMessage(msg);
+                if(cityModel != null) {
+                    Message msg = mHandler.obtainMessage();
+                    msg.obj = cityModel;
+                    msg.what = ADD_CITY;
+                    mHandler.sendMessage(msg);
+                }
             }
         }
     }
 
     class FetchWeatherPeriodically implements Runnable{
-
-
         @Override
         public void run(){
             synchronized (mCityModels){
@@ -316,20 +280,17 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             fetchWeather(location);
         }
 
-        private void fetchLocalTime(String location, final CityModel model){
+        private void fetchLocalTime(final CityModel model){
 
-            String url = "https://maps.googleapis.com/maps/api/timezone/json?location="+location+"&timestamp="+DateHelper.getTimeStamp()+"&key="+getString(R.string.google_timezone_key);
+            String url = "https://maps.googleapis.com/maps/api/timezone/json?location="+model.latlng+"&timestamp="+DateHelper.getTimeStamp()+"&key="+getString(R.string.google_timezone_key);
             ((WeatherApp) WeatherApp.getInstance()).addToRequestQueue(new JsonObjectRequest(url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
                                 Logger.d(TAG, response.toString());
-
                                 model.timeZoneId = JsonHelper.getString(response, "timeZoneId");
                                 post(model);
-
-
                             }catch(Exception e) {
                                 e.printStackTrace();
                             }
@@ -350,17 +311,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                         public void onResponse(JSONObject response) {
                             try {
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
-
-
-                                CityModel model = new CityModel();
-                                model.cityName = weatherModel.city;
-                                model.latlng = weatherModel.lat+","+weatherModel.lon;
-                                model.currentTemp = String.valueOf(weatherModel.temp);
-                                model.location = location;
-
-                                fetchLocalTime(weatherModel.lat+","+weatherModel.lon, model);
-
-
+                                CityModel model = CityModel.makeFrom(weatherModel);
+                                fetchLocalTime( model);
                             }catch(Exception e) {
                                 e.printStackTrace();
                             }
@@ -395,11 +347,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
                 case REMOVE_CITY:
                     int index = (int) msg.obj;
-                    mCityModels.remove(index);
-                    mAdapter.notifyDataSetChanged();
-
+                    removeFromSystem(index);
                     break;
-
                 case UPDATE_CITY_TIME:
                     mAdapter.notifyDataSetChanged();
                     break;
@@ -413,6 +362,19 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
         }
     };
+
+    private void removeFromSystem(int index){
+        CityModel cityModel = mCityModels.get(index);
+        if(cityModel != null){
+
+            Intent i = new Intent(this, RemoveWeatherIntentService.class);
+            i.putExtra(RemoveWeatherIntentService.REMOVE_LOCATION, cityModel.location);
+            startService(i);
+
+            mCityModels.remove(index);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
 
     class ActionModeCallback implements ActionMode.Callback{
 

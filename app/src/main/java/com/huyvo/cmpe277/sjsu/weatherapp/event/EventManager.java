@@ -106,7 +106,7 @@ public class EventManager implements ThreadCompleteListener {
      */
     private int generateId() {
         // nextInt is normally exclusive of the top value,
-        // so add 1 to make it inclusive
+        // so add 1 to makeFrom it inclusive
         int randomNum = rand.nextInt((MAX_ID - MIN_ID) + 1) + MIN_ID;
         while (eventPool.containsKey(randomNum)) {
             randomNum = rand.nextInt((MAX_ID - MIN_ID) + 1) + MIN_ID;

@@ -29,17 +29,17 @@ import java.util.ArrayList;
  * Created by Huy Vo on 10/27/17.
  */
 
-public class UpdateWeatherIntentService extends IntentService {
-    public final static String TAG = "UpdateWeatherIntentService";
+public class UpdateForecastIntentService extends IntentService {
+    public final static String TAG = "UpdateForecastIntentService";
 
     public final static String UPDATE = "com.huyvo.cmpe277.sjsu.update";
     public final static String LOCATION = "com.huyvo.cmpe277.sjsu.location";
 
-    public UpdateWeatherIntentService(){
+    public UpdateForecastIntentService(){
         this(TAG);
     }
 
-    public UpdateWeatherIntentService(String name) {
+    public UpdateForecastIntentService(String name) {
         super(name);
     }
 

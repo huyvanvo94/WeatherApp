@@ -45,7 +45,7 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
 
             if(cityModel.currentTemp != null){
                 TextView weatherTextView = (TextView) convertView.findViewById(R.id.text_view_weather);
-                weatherTextView.setText("Current temperature "+ cityModel.currentTemp);
+                weatherTextView.setText("Current temperature "+ cityModel.getCurrentTemp());
             }
 
         }

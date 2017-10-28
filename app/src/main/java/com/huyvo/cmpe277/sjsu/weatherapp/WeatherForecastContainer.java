@@ -46,6 +46,11 @@ public class WeatherForecastContainer {
 
     public boolean shouldRequestFetchWeather(String location){
 
+
+        if(mfHashMap.get(location) == null){
+            return false;
+        }
+
         long timestamp = mfHashMap.get(location).mTimestamp;
 
         if(System.currentTimeMillis() - timestamp >= REQUEST_WEATHER_FIVE_MINUTES){
