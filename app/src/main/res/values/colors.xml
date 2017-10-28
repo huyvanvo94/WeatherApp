@@ -5,4 +5,25 @@
     <color name="colorAccent">#FF4081</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
+    <color name="blue" >#5194ff</color>
+    <color name="purple" >#FFAA66CC</color>
+    <color name="green" >#FF99CC00</color>
+    <color name="orange" >#FFFFBB33</color>
+    <color name="darkblue" >#FF0099CC</color>
+    <color name="darkpurple" >#FF9933CC</color>
+    <color name="darkgreen" >#FF669900</color>
+    <color name="darkorange" >#FFFF8800</color>
+    <color name="darkred" >#FFCC0000</color>
+
+    <integer-array name="backgroundcolors">
+        <item>@color/blue</item>
+        <item>@color/purple</item>
+        <item>@color/green</item>
+        <item>@color/orange</item>
+        <item>@color/darkblue</item>
+        <item>@color/darkpurple</item>
+        <item>@color/darkgreen</item>
+        <item>@color/darkorange</item>
+        <item>@color/darkred</item>
+    </integer-array>
 </resources>

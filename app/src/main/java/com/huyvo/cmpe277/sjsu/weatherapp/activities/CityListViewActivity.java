@@ -55,6 +55,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     private CityViewAdapter mAdapter;
     private final List<CityModel> mCityModels = new ArrayList<>();
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    int count = 0;
 
     private ActionMode.Callback mCallback;
     @Override
@@ -196,6 +197,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 WeatherModel weatherModel = forecastContainer.getWeatherModels(location).get(0);
 
                 CityModel cityModel = CityModel.makeFrom(weatherModel);
+                cityModel.index = count++;
 
                 if(cityModel != null) {
                     Message msg = mHandler.obtainMessage();
@@ -312,6 +314,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                             try {
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
                                 CityModel model = CityModel.makeFrom(weatherModel);
+                                model.index = count++;
                                 fetchLocalTime( model);
                             }catch(Exception e) {
                                 e.printStackTrace();

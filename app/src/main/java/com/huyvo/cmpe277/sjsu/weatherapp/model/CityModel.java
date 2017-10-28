@@ -10,6 +10,8 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
     public String cityName;
     public String currentTemp;
     public String latlng;
+    public String icon;
+    public int index;
 
     public String location;
 
@@ -24,11 +26,12 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
         CityModel cityModel = new CityModel();
         cityModel.timeZoneId = weatherModel.timeZoneId;
         cityModel.cityName = weatherModel.city;
+        cityModel.icon = weatherModel.icon;
         cityModel.latlng = weatherModel.lat+","+weatherModel.lon;
         if(weatherModel.temp_day != 0.0){
-            cityModel.currentTemp = String.valueOf(weatherModel.temp_day);
+            cityModel.currentTemp = String.valueOf((int) weatherModel.temp_day);
         }else{
-            cityModel.currentTemp = String.valueOf(weatherModel.temp);
+            cityModel.currentTemp = String.valueOf((int) weatherModel.temp);
         }
 
 
