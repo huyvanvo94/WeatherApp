@@ -16,10 +16,12 @@ import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
+import com.huyvo.cmpe277.sjsu.weatherapp.model.Postable;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.UpdateForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
@@ -128,7 +130,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public static final int UPDATE_FORCAST = 6;
     }
 
-    class PostForecastRunnable implements Runnable, PostFinishedListener, Postable{
+    class PostForecastRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
         public PostForecastRunnable(List<String> locations){
 

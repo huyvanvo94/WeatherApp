@@ -1,8 +1,11 @@
-package com.huyvo.cmpe277.sjsu.weatherapp;
+package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 
 /**
  * Created by Huy Vo on 10/28/17.

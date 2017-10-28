@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp;
+package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -13,10 +13,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.huyvo.cmpe277.sjsu.weatherapp.R;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonHelper;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
