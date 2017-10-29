@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +12,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
-import org.w3c.dom.Text;
-
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class WeatherFragment extends Fragment {
@@ -92,6 +88,9 @@ public class WeatherFragment extends Fragment {
 //
 //
 
+    /**
+     * The first index is today!
+     */
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){
         Logger.d(TAG, "setForecastView" + String.valueOf(v==null));
 
@@ -106,23 +105,25 @@ public class WeatherFragment extends Fragment {
         TextView humidityTextView = (TextView) v.findViewById(R.id.textview_humidity);
         TextView pressureTextView = (TextView) v.findViewById(R.id.textview_pressure);
         TextView windSpeedTextView = (TextView) v.findViewById(R.id.textview_windspeed);
-
+        int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
         WeatherModel weatherModel = fiveDaysForecastList.get(0);
 
-        int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
-        int itemColor = backgroundColors[weatherModel.colorIndex];
+        int index = WeatherApp.getLatLngList().indexOf(weatherModel.getKey());
+        Logger.d(TAG, weatherModel.getKey());
+        Logger.d(TAG, WeatherApp.getLatLngList().toString());
+        int itemColor = backgroundColors[index % 9 ];
         weatherLayout.setBackgroundColor(itemColor);
 
         if(weatherModel.city != null){
             cityNameTextView.setText(weatherModel.city);
             currentDateTextView.setText(weatherModel.getDayOfTheWeek());
 
-            humidityTextView.setText(String.valueOf(weatherModel.humidity) + " %");
+            humidityTextView.setText(weatherModel.humidity + " %");
             Drawable humidityIcon = getContext().getDrawable(R.drawable.icon_humidity);
             humidityIcon.setBounds(0,0,100,100);
             humidityTextView.setCompoundDrawables(null, humidityIcon, null, null);
 
-            pressureTextView.setText(String.valueOf(weatherModel.pressure) + " hPa");
+            pressureTextView.setText(weatherModel.pressure + " hPa");
             Drawable pressureIcon = getContext().getDrawable(R.drawable.icon_pressure);
             pressureIcon.setBounds(0,0, 100, 100);
             pressureTextView.setCompoundDrawables(null, pressureIcon, null, null);

@@ -22,17 +22,26 @@ public class WeatherModel implements BaseModel {
     public float temp_eve;
     public float temp_morn;
 
+    public double lat;
+    public double lon;
+
     public String main;
     public String icon;
     public float degree;
 
     public String country;
     public String city;
-    public String lat;
-    public String lon;
+
     public String description;
 
     public String timeZoneId;
+
+    public String getKey(){
+        String lat = String.format("%.2f", this.lat);
+        String lon = String.format("%.2f", this.lon);
+
+        return "lat="+ lat +"&lon="+lon;
+    }
 
 
     public String getDate() {

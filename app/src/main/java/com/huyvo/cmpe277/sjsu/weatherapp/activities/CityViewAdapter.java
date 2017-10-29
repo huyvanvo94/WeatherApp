@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
 
 import java.util.List;
@@ -43,12 +44,15 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
 
             int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
 
-            int itemColor = backgroundColors[2];
+            int index = WeatherApp.getLatLngList().indexOf(cityModel.key);
+
+            int itemColor = backgroundColors[index % 9 ];
+            ListItemLayout.setBackgroundColor(itemColor);
 
             cityNameTextView.setText(cityModel.cityName);
             //hardcoded Fahrenheit for now
             currentTempTextView.setText(cityModel.currentTemp + '\u00B0' + " F");
-            ListItemLayout.setBackgroundColor(itemColor);
+
 
             if(cityModel.icon != null){
                 switch(cityModel.icon){
@@ -85,6 +89,10 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
                         Drawable icon_mist = getContext().getDrawable(R.drawable.icon_mist);
                         icon_mist.setBounds(0, 0, 400, 400);
                         cityNameTextView.setCompoundDrawables(null, null, icon_mist, null);
+                        break;
+                    //TODO: Give a default 
+                    default:
+
                         break;
                 }
 

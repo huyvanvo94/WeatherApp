@@ -48,6 +48,7 @@ public class FetchForecastIntentService extends IntentService {
 
                         WeatherModel weatherModel = result.get(0);
                         PlaceService placeService = new GooglePlaceService();
+                        Logger.d(TAG, weatherModel.lat+","+weatherModel.lon);
                         placeService.getLocalTime(weatherModel.lat+","+weatherModel.lon, new FutureTaskListener<LocalTimeModel>() {
                             @Override
                             public void onCompletion(LocalTimeModel resultLocalTime) {

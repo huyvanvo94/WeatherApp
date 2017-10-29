@@ -54,9 +54,9 @@ public class JsonParser {
         weatherModel.country = JsonHelper.getString(sysObject, "country");
         weatherModel.city = JsonHelper.getString(jsonObject, "name");
 
-        JSONObject coorObjec = JsonHelper.getJSONObject(jsonObject, "coord");
-        weatherModel.lon = JsonHelper.getString(coorObjec, "lon");
-        weatherModel.lat = JsonHelper.getString(coorObjec, "lat");
+        JSONObject coorObject = JsonHelper.getJSONObject(jsonObject, "coord");
+        weatherModel.lon = JsonHelper.getDouble(coorObject, "lon");
+        weatherModel.lat = JsonHelper.getDouble(coorObject, "lat");
 
         return weatherModel;
     }
@@ -72,24 +72,24 @@ public class JsonParser {
         String country = JsonHelper.getString(cityObject, "country");
 
         JSONObject coorObjec = JsonHelper.getJSONObject(cityObject, "coord");
-        String lon = JsonHelper.getString(coorObjec, "lon");
-        String lat = JsonHelper.getString(coorObjec, "lat");
-
+        double lon = JsonHelper.getDouble(coorObjec, "lon");
+        double lat = JsonHelper.getDouble(coorObjec, "lat");
         ArrayList<WeatherModel> weatherModels = new ArrayList<>();
         JSONArray weatherJsonArray = JsonHelper.getJSONArray(createJSONObject(jsonObjectString), "list");
         int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
 
-        Logger.e("JsonParser", JsonHelper.toString(weatherJsonArray, true));
         for (int i = 0; i < length; i++) {
             WeatherModel weatherModel = new WeatherModel();
             JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
+            weatherModel.lat = lat;
+            weatherModel.lon = lon;
             if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") == 6) {
                 continue;
             }
             weatherModel.country = country;
-            weatherModel.lat = lat;
-            weatherModel.lon = lon;
+
+
             weatherModel.city = city;
 
             weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(jsonObject, "pressure"));

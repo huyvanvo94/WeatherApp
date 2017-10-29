@@ -1,5 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
+import android.util.Log;
+
 import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 
@@ -10,6 +12,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 public class GooglePlaceService implements PlaceService {
     @Override
     public void getLocalTime(String location, final FutureTaskListener<LocalTimeModel> listener) {
+        Log.d("OK",location);
         String url = "https://maps.googleapis.com/maps/api/timezone/json?location="
                 +location+"&timestamp="
                 + System.currentTimeMillis() / 1000L

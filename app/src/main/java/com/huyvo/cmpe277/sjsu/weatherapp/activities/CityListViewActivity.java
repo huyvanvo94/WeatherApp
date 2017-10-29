@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -116,7 +117,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
-                String location = "lat="+lat+"&lon="+lng;
+                Log.d("Mine", lat+"");
+                String location = "lat="+ String.format("%.2f",lat)+"&lon="+String.format("%.2f",lng);
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
 
@@ -217,7 +219,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
         private void fetchWeather(final CityModel cityModel){
             DataService dataService = new OpenWeatherDataService();
-            String location = cityModel.location;
+            String location = cityModel.key;
 
             dataService.getWeatherByLatLng(location, new FutureTaskListener<WeatherModel>() {
                 @Override
@@ -281,6 +283,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
         private void fetchLocalTime(final CityModel model){
             PlaceService placeService = new GooglePlaceService();
+            Logger.d(TAG, model.latlng);
+
             placeService.getLocalTime(model.latlng, new FutureTaskListener<LocalTimeModel>() {
                 @Override
                 public void onCompletion(LocalTimeModel result) {
@@ -307,7 +311,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 @Override
                 public void onCompletion(WeatherModel result) {
                     CityModel model = CityModel.makeFrom(result);
-                    fetchLocalTime( model);
+                    fetchLocalTime( model );
                 }
 
                 @Override
@@ -362,7 +366,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         if(cityModel != null){
 
             Intent i = new Intent(this, RemoveWeatherIntentService.class);
-            i.putExtra(RemoveWeatherIntentService.REMOVE_LOCATION, cityModel.location);
+            i.putExtra(RemoveWeatherIntentService.REMOVE_LOCATION, cityModel.key);
             startService(i);
 
             mCityModels.remove(index);

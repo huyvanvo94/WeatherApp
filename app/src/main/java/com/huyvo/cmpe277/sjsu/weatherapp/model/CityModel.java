@@ -12,7 +12,7 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
     public String latlng;
     public String icon;
 
-    public String location;
+    public String key;
 
     public String timeZoneId;
 
@@ -35,8 +35,7 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
             cityModel.currentTemp = String.valueOf((int) weatherModel.temp);
         }
 
-
-        cityModel.location = "lat="+weatherModel.lat+"&lon="+weatherModel.lon;
+        cityModel.key = weatherModel.getKey();
         return cityModel;
     }
 

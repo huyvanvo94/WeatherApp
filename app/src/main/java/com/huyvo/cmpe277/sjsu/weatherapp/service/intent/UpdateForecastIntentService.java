@@ -28,7 +28,7 @@ public class UpdateForecastIntentService extends IntentService {
     public final static String TAG = "UpdateForecastIntentService";
 
     public final static String UPDATE = "com.huyvo.cmpe277.sjsu.update";
-    public final static String LOCATION = "com.huyvo.cmpe277.sjsu.location";
+    public final static String LOCATION = "com.huyvo.cmpe277.sjsu.key";
 
     public UpdateForecastIntentService(){
         this(TAG);
