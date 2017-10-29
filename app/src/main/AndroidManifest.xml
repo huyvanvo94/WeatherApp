@@ -16,7 +16,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBMJSt7_3koa-jndHAzb6FYKleRAHtTpnY" />
 
-        <activity android:name=".MainActivity">
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.CityListViewActivity"
             android:label="@string/title_activity_weather_city_list_view" >
 
@@ -35,6 +38,7 @@
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"
             android:parentActivityName=".activities.BaseActivityWithFragment">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
