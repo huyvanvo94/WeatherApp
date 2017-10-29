@@ -5,13 +5,10 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.GooglePlaceService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.PlaceService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
@@ -46,30 +43,7 @@ public class FetchForecastIntentService extends IntentService {
                     if(result != null){
                         //Logger.d(TAG, "onHandleIntent"+result.toString());
 
-                        WeatherModel weatherModel = result.get(0);
-                        PlaceService placeService = new GooglePlaceService();
-                        Logger.d(TAG, weatherModel.lat+","+weatherModel.lon);
-                        placeService.getLocalTime(weatherModel.lat+","+weatherModel.lon, new FutureTaskListener<LocalTimeModel>() {
-                            @Override
-                            public void onCompletion(LocalTimeModel resultLocalTime) {
-                                //Logger.d(TAG, resultLocalTime.timeZoneId);
-                                result.get(0).timeZoneId = resultLocalTime.timeZoneId;
-                                WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-                                weatherForecastContainer.put(location, result);
-
-
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-
-                            }
-
-                            @Override
-                            public void onProgress(float progress) {
-
-                            }
-                        });
+                        WeatherForecastContainer.getInstance().put(location, result);
 
                     }
                 }

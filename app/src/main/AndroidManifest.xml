@@ -56,6 +56,14 @@
             android:exported="false"
             />
 
+        <service
+            android:name=".service.intent.today.FetchTodayWeatherIntentService"
+            android:exported="false"
+            />
+        <service
+            android:name=".service.intent.RemoveWeatherIntentService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

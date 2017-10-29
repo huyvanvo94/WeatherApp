@@ -1,19 +1,18 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Formatter;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.List;
@@ -22,25 +21,19 @@ public class WeatherFragment extends Fragment {
     public static final String TAG = "WeatherFragment";
 
     private View v;
-    private WeatherModel weatherModel;
+    private WeatherModel today;
     private List<WeatherModel> mFiveDaysForecastList;
     
     public WeatherFragment() {
 
     }
 
-    public static WeatherFragment newInstance(List<WeatherModel> fiveDaysForecastList){
+    public static WeatherFragment newInstance(List<WeatherModel> fiveDaysForecastList, WeatherModel today){
         WeatherFragment fragment = new WeatherFragment();
         fragment.mFiveDaysForecastList = fiveDaysForecastList;
+        fragment.today = today;
         return fragment;
     }
-    public static WeatherFragment newInstance(WeatherModel model){
-        Logger.d(TAG, model.city);
-        WeatherFragment weatherFragment = new WeatherFragment();
-        weatherFragment.weatherModel = model;
-        return weatherFragment;
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,7 +46,9 @@ public class WeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         Logger.d(TAG, "onCreateView");
         v = inflater.inflate(R.layout.fragment_weather, container, false);
-        setForecastView(mFiveDaysForecastList);
+        setBackgroundColor(today);
+        setTodayView(today);
+        //setForecastView(mFiveDaysForecastList);
         return v;
     }
 
@@ -73,30 +68,44 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public List<WeatherModel> getFiveDaysForecastList(){
-        return mFiveDaysForecastList;
+    private void setBackgroundColor(WeatherModel weatherModel){
+        if(weatherModel == null || v == null){
+            return;
+        }
+        RelativeLayout weatherLayout = (RelativeLayout) v.findViewById(R.id.weather_layout);
+        int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
+        int index = WeatherApp.getLatLngList().indexOf(weatherModel.getKey());
+        int itemColor = backgroundColors[index % 9 ];
+        weatherLayout.setBackgroundColor(itemColor);
+
     }
-    public WeatherModel getWeatherModel(){
-        return weatherModel;
+ 
+    public void setTodayView(WeatherModel weatherModel){
+        if(weatherModel == null || v == null){
+            return;
+        }
+
+        Logger.d(TAG, weatherModel.city);
+
+        Formatter formatter = new Formatter();
+        TextView cityNameTextView = (TextView) v.findViewById(R.id.textview_city_name);
+        cityNameTextView.setText(weatherModel.city);
+
+        TextView dateTextView = (TextView) v.findViewById(R.id.text_view_date);
+        dateTextView.setText(formatter.formatDate(weatherModel));
+
+
+        TextView todayTemp = (TextView) v.findViewById(R.id.text_view_today_temp);
+        todayTemp.setText(formatter.formatTemperature(weatherModel.temp));
     }
 
-
-//    to do:
-// fit min and max temp in layout
-//
-//
-//
-//
-
-    /**
-     * The first index is today!
-     */
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){
         Logger.d(TAG, "setForecastView" + String.valueOf(v==null));
 
         if(fiveDaysForecastList == null || v == null){
             return;
         }
+        /*
         LinearLayout weatherLayout = (LinearLayout) v.findViewById(R.id.weather_layout);
         ListView forecastView = (ListView) v.findViewById(R.id.five_day_forecast_list);
         TextView cityNameTextView = (TextView) v.findViewById(R.id.textview_city_name);
@@ -104,16 +113,9 @@ public class WeatherFragment extends Fragment {
         TextView currentTempTextView = (TextView) v.findViewById(R.id.textview_temp);
         TextView humidityTextView = (TextView) v.findViewById(R.id.textview_humidity);
         TextView pressureTextView = (TextView) v.findViewById(R.id.textview_pressure);
-        TextView windSpeedTextView = (TextView) v.findViewById(R.id.textview_windspeed);
-        int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
-        WeatherModel weatherModel = fiveDaysForecastList.get(0);
+        TextView windSpeedTextView = (TextView) v.findViewById(R.id.textview_windspeed);*/
 
-        int index = WeatherApp.getLatLngList().indexOf(weatherModel.getKey());
-        Logger.d(TAG, weatherModel.getKey());
-        Logger.d(TAG, WeatherApp.getLatLngList().toString());
-        int itemColor = backgroundColors[index % 9 ];
-        weatherLayout.setBackgroundColor(itemColor);
-
+        /**
         if(weatherModel.city != null){
             cityNameTextView.setText(weatherModel.city);
             currentDateTextView.setText(weatherModel.getDayOfTheWeek());
@@ -140,13 +142,9 @@ public class WeatherFragment extends Fragment {
             }
 
 
-        }
+        }*/
 
 
-    }
-
-    public interface WeatherEventListener{
-        void update();
     }
 
 }

@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 
@@ -28,8 +29,8 @@ public class RemoveWeatherIntentService extends IntentService {
         try {
             final String location = intent.getStringExtra(REMOVE_LOCATION);
             if (location != null) {
-                WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-                weatherForecastContainer.remove(location);
+                WeatherForecastContainer.getInstance().remove(location);
+                TodayWeatherContainer.getInstance().remove(location);
                 WeatherApp.getLatLngList().remove(location);
             }
         }catch (NullPointerException exception){

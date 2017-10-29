@@ -27,8 +27,8 @@ import java.util.ArrayList;
 public class UpdateForecastIntentService extends IntentService {
     public final static String TAG = "UpdateForecastIntentService";
 
-    public final static String UPDATE = "com.huyvo.cmpe277.sjsu.update";
-    public final static String LOCATION = "com.huyvo.cmpe277.sjsu.key";
+    public final static String WHO = "com.huyvo.cmpe277.sjsu.update";
+    public final static String FETCH_FORECAST = "com.huyvo.cmpe277.sjsu.key";
 
     public UpdateForecastIntentService(){
         this(TAG);
@@ -43,9 +43,9 @@ public class UpdateForecastIntentService extends IntentService {
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            final Messenger messenger = (Messenger) bundle.get(UPDATE);
+            final Messenger messenger = (Messenger) bundle.get(WHO);
             final Message msg = Message.obtain();
-            final String location = bundle.getString(LOCATION);
+            final String location = bundle.getString(FETCH_FORECAST);
 
             if (location != null) {
                 DataService service = new OpenWeatherDataService();
@@ -67,7 +67,7 @@ public class UpdateForecastIntentService extends IntentService {
                                         weatherForecastContainer.put(location, result);
 
                                         Bundle b = intent.getExtras();
-                                        b.putString(LOCATION, location);
+                                        b.putString(FETCH_FORECAST, location);
                                         msg.setData(b);
                                         try {
                                             messenger.send(msg);

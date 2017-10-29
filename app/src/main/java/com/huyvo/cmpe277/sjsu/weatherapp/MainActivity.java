@@ -16,25 +16,15 @@ import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
-import com.huyvo.cmpe277.sjsu.weatherapp.util.Constants;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today.FetchTodayWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_EMPTY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_MANY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_ONCE_AT_A_TIME;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
@@ -57,17 +47,26 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
         List<String> mLocations = WeatherApp.getLatLngList();
         if(!mLocations.isEmpty()){
-            postFinishedListener = new PostForecastRunnable(mLocations);
+            postFinishedListener = new LoadAllDataRunnable(mLocations);
             new Thread((Runnable) postFinishedListener).start();
             // Update Every 3 hours if user is on screen
-            ScheduledExecutorService executorService= Executors.newScheduledThreadPool(1);
-            executorService.scheduleAtFixedRate(new UpdateForecastPeriodicallyRunnable(), 0, 3, TimeUnit.HOURS);
+            /**
+            ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+            executorService.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (WeatherApp.getLatLngList()) {
+
+                        for (String location : WeatherApp.getLatLngList()) {
+                            fetchForecast(location);
+                            fetchTodayWeather(location);
+                        }
+                    }
+                }
+            }, 0, 3, TimeUnit.HOURS);*/
         }
 
-
-
     }
-
 
     public void setCurrentItem(int position){
         ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
@@ -119,8 +118,29 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         boolean shouldRequestFetchWeather = container.shouldRequestFetchWeather(WeatherApp.getLatLngList().get(position));
         if(shouldRequestFetchWeather){
             mPosition = position;
-            new Thread(new UpdateWeatherForecastRunnable(WeatherApp.getLatLngList().get(mPosition))).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String location = WeatherApp.getLatLngList().get(mPosition);
+                    fetchTodayWeather(location);
+                    fetchForecast(location);
+                }
+            }).start();
         }
+    }
+
+    private void fetchTodayWeather(String location){
+        Intent i = new Intent(this, FetchTodayWeatherIntentService.class);
+        i.putExtra(FetchTodayWeatherIntentService.FETCH_WEATHER, location);
+        i.putExtra(FetchTodayWeatherIntentService.WHO, new Messenger(mHandler));
+        startService(i);
+    }
+
+    public void fetchForecast(String location){
+        Intent intent = new Intent(MainActivity.this, UpdateForecastIntentService.class);
+        intent.putExtra(UpdateForecastIntentService.WHO, new Messenger(mHandler));
+        intent.putExtra(UpdateForecastIntentService.FETCH_FORECAST, location);
+        startService(intent);
     }
 
     @Override
@@ -128,9 +148,9 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     }
 
-    class PostForecastRunnable implements Runnable, PostFinishedListener, Postable {
+    class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
-        public PostForecastRunnable(List<String> locations){
+        public LoadAllDataRunnable(List<String> locations){
 
             mLocations = new LinkedList<>(locations);
         }
@@ -153,8 +173,16 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                     WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
                     List<WeatherModel> weatherModels = weatherForecastContainer.getWeatherModels(location);
 
+                    TodayWeatherContainer todayWeatherContainer = TodayWeatherContainer.getInstance();
+                    WeatherModel weatherModel = todayWeatherContainer.getWeatherModel(location);
+
+                    LoadingPair loadingPair = new LoadingPair();
+                    loadingPair.mModels = weatherModels;
+                    loadingPair.model = weatherModel;
+
                     Message message = mHandler.obtainMessage();
-                    message.obj = weatherModels;
+                    message.obj = loadingPair;
+
                     message.what = -1;
                     mHandler.sendMessage(message);
                 }catch (Exception e){}
@@ -163,185 +191,54 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         }
     }
 
-    class UpdateForecastPeriodicallyRunnable implements Runnable{
-
-
-        public UpdateForecastPeriodicallyRunnable(){
-        }
-
-        @Override
-        public void run() {
-
-            List<String> locations = WeatherApp.getLatLngList();
-
-            for(String location: locations) {
-                Intent intent = new Intent(MainActivity.this, UpdateForecastIntentService.class);
-                intent.putExtra(UpdateForecastIntentService.UPDATE, new Messenger(mHandler));
-                intent.putExtra(UpdateForecastIntentService.LOCATION, location);
-                startService(intent);
-            }
-        }
-
-
-    }
-
-
-    class LoadForecastRunnable implements Runnable{
-
-        private String mLocation;
-        public LoadForecastRunnable(int position){
-            mLocation = WeatherApp.getLatLngList().get(position);
-        }
-
-        public LoadForecastRunnable(String location){
-            mLocation = location;
-        }
-        @Override
-        public void run() {
-
-            fetchWeather(mLocation);
-
-        }
-
-        private void fetchWeather(String location){
-            DataService dataService = new OpenWeatherDataService();
-            dataService.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
-                @Override
-                public void onCompletion(ArrayList<WeatherModel> result) {
-                    Message message = mHandler.obtainMessage();
-                    message.what = Constants.MainViewMessages.ADD;
-                    message.obj = result;
-                    mHandler.sendMessage(message);
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
-        }
-    }
 
     interface PostFinishedListener{
         void done();
-    }
-
-    class UpdateWeatherForecastRunnable implements Runnable{
-
-        private String mLocation;
-
-        public UpdateWeatherForecastRunnable(String location){
-            mLocation = location;
-
-        }
-
-        @Override
-        public void run() {
-            fetchForecast(mLocation);
-
-        }
-
-        private void fetchForecast(String location){
-            DataService dataService = new OpenWeatherDataService();
-            dataService.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
-                @Override
-                public void onCompletion(ArrayList<WeatherModel> result) {
-                    if(result != null){
-                        WeatherForecastContainer container = WeatherForecastContainer.getInstance();
-                        container.put(mLocation, result);
-
-                        Message msg = mHandler.obtainMessage();
-                        msg.obj = result;
-                        msg.what = Constants.MainViewMessages.UPDATE;
-                        mHandler.sendMessage(msg);
-                    }
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
-
-        }
     }
 
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg) {
             Bundle reply = msg.getData();
             if(reply != null){
-                String location = reply.getString(UpdateForecastIntentService.LOCATION, null);
+                String location = reply.getString(UpdateForecastIntentService.FETCH_FORECAST, null);
                 if(location != null){
-                    WeatherForecastContainer weatherForecastContainer = WeatherForecastContainer.getInstance();
-                    List<WeatherModel> models = weatherForecastContainer.getWeatherModels(location);
-
+                    List<WeatherModel> models = WeatherForecastContainer.getInstance().getWeatherModels(location);
                     int position = WeatherApp.getLatLngList().indexOf(location);
-                    replaceFragmentInAdapter(position, models);
-
+                    updateForecastView(position, models);
                     return;
                 }
 
-
+                location = reply.getString(FetchTodayWeatherIntentService.FETCH_WEATHER, null);
+                if(location != null){
+                    WeatherModel model = TodayWeatherContainer.getInstance().getWeatherModel(location);
+                    int position = WeatherApp.getLatLngList().indexOf(model);
+                    updateTodayView(position, model);
+                    return;
+                }
             }
 
 
             switch (msg.what){
                 case ADD:
                     List<WeatherModel> models = (List) msg.obj;
-
-                    replaceFragmentInAdapter(mPosition, models);
+                    updateForecastView(mPosition, models);
                     setCurrentItem(mPosition);
                     break;
-                case ADD_EMPTY:
 
-                    int len = addToAdapter(new WeatherFragment());
-
-                    if(mPosition == len-1){
-                        new Thread(new LoadForecastRunnable(mPosition)).start();
-                    }
-
-                    break;
-
-                case ADD_ONCE_AT_A_TIME:
-                    List<WeatherModel> weatherModels = (List) msg.obj;
-                    int aLen = addToAdapter(WeatherFragment.newInstance(weatherModels));
-                    if(aLen-1 == mPosition){
-                        setCurrentItem(mPosition);
-                    }
-                    postFinishedListener.done();
-                    break;
-                case ADD_MANY:
-                    List<WeatherFragment> fragments = (List) msg.obj;
-                    for(WeatherFragment f: fragments){
-                        addToAdapter(f);
-                    }
-
-                    setCurrentItem(mPosition);
-                    break;
                 case UPDATE:
 
-                    replaceFragmentInAdapter(mPosition, (List) msg.obj);
+                    updateForecastView(mPosition, (List) msg.obj);
 
                     break;
 
                 case UPDATE_FORECAST:
                     ForecastInfo info = (ForecastInfo) msg.obj;
-                    replaceFragmentInAdapter(info.position, info.mList);
+                    updateForecastView(info.position, info.mList);
                     break;
                 default:
                     if( msg.obj != null) {
 
-                        int length = addToAdapter((List) msg.obj);
+                        int length = addToAdapter((LoadingPair) msg.obj);
                         postFinishedListener.done();
                         if (length - 1 == mPosition) {
                             setCurrentItem(mPosition);
@@ -354,14 +251,14 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         }
     };
 
-    public int addToAdapter(List<WeatherModel> weatherModels){
+    public int addToAdapter(LoadingPair loadingPair){
         ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
-        wpa.add(WeatherFragment.newInstance(weatherModels));
+        wpa.add(WeatherFragment.newInstance(loadingPair.mModels, loadingPair.model));
         return wpa.getCount();
     }
-    public boolean replaceFragmentInAdapter(int position, List<WeatherModel> weatherModels){
-        Logger.d(TAG, "replaceFragmentInAdapter");
+    public boolean updateForecastView(int position, List<WeatherModel> weatherModels){
+        Logger.d(TAG, "updateForecastView");
         ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
 
@@ -375,12 +272,31 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         fragment.setForecastView(weatherModels);
         return true;
     }
+    public boolean updateTodayView(int position, WeatherModel model){
+        ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
+        WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
+
+        if(position >= wpa.getCount()){
+            return false;
+        }
+        WeatherFragment fragment = (WeatherFragment) wpa.getItem(position);
+        if(fragment == null){
+            return false;
+        }
+        fragment.setTodayView(model);
+        return true;
+    }
 
     public int addToAdapter(WeatherFragment fragment){
         ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
         wpa.add(fragment);
         return wpa.getCount();
+    }
+
+    class LoadingPair{
+        public List<WeatherModel> mModels;
+        public WeatherModel model;
     }
 
     class ForecastInfo{

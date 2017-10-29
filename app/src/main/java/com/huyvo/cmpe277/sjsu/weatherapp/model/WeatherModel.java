@@ -43,6 +43,19 @@ public class WeatherModel implements BaseModel {
         return "lat="+ lat +"&lon="+lon;
     }
 
+    public float getTemp(){
+        if(temp == 0.0){
+            return temp_day;
+        }
+
+        return temp;
+    }
+
+    public String getLocalTime(){
+        long unixTime = System.currentTimeMillis() / 1000L;
+        return DateHelper.getLocalTime(unixTime, timeZoneId);
+    }
+
 
     public String getDate() {
         return DateHelper.getDate(dt, "GMT-4", "MMM d");

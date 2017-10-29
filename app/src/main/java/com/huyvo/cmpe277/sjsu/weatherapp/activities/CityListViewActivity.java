@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,18 +23,12 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
+import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
-import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.GooglePlaceService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.PlaceService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.RemoveWeatherIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today.FetchTodayWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
@@ -45,13 +39,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.ADD_CITY;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.REMOVE_CITY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_CITY_TIME;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_TIME;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_WEATHER;
 
 public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
     public final static String TAG = CityListViewActivity.class.getSimpleName();
     private CityViewAdapter mAdapter;
-    private final List<CityModel> mCityModels = new ArrayList<>();
+    private final List<WeatherModel> mModels = new ArrayList<>();
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     private ActionMode.Callback mCallback;
@@ -76,7 +70,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         mCallback = new ActionModeCallback();
 
         FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
-        mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, mCityModels);
+        mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, mModels);
         ListView listView = (ListView) findViewById(R.id.list_city_view);
         listView.setAdapter(mAdapter);
         mFabAddCity.setOnClickListener(this);
@@ -87,7 +81,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     private void load(List<String> locations){
         Logger.d(TAG, String.valueOf(locations.size()));
         if(!locations.isEmpty()) {
-            new Thread(new CitiesLoadRunnable(locations)).start();
+            new Thread(new LoadDataRunnable(locations)).start();
         }
     }
 
@@ -105,6 +99,18 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     }
 
+    private void fetchTodayWeather(String location){
+        Intent intent = new Intent(this, FetchTodayWeatherIntentService.class);
+        intent.putExtra(FetchTodayWeatherIntentService.FETCH_WEATHER, location);
+        intent.putExtra(FetchTodayWeatherIntentService.WHO, new Messenger(mHandler));
+        startService(intent);
+    }
+
+    private void fetchForecastWeather(String location){
+        Intent intent = new Intent(this, FetchForecastIntentService.class);
+        intent.putExtra(FetchForecastIntentService.FETCH_WEATHER, location);
+        startService(intent);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -117,18 +123,11 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
-                Log.d("Mine", lat+"");
                 String location = "lat="+ String.format("%.2f",lat)+"&lon="+String.format("%.2f",lng);
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
-
-                    Intent intent = new Intent(this, FetchForecastIntentService.class);
-                    intent.putExtra(FetchForecastIntentService.FETCH_WEATHER, location);
-                    startService(intent);
-
-                    // update current view inside of waiting
-                    // for forecast fetching which will take relatively long
-                    new Thread(new CityLoadRunnable(location)).start();
+                    fetchTodayWeather(location);
+                    fetchForecastWeather(location);
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -177,74 +176,49 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
         Logger.d(TAG, "onItemLongClick");
-        startActionMode(mCallback);
+        //startActionMode(mCallback);
+        removeFromSystem(i);
+
         return false;
     }
 
-    class CitiesLoadRunnable implements Runnable{
+    class LoadDataRunnable implements Runnable{
 
         private List<String> mLocations;
 
-        public CitiesLoadRunnable(List<String> locations){
+        public LoadDataRunnable(List<String> locations){
             mLocations = locations;
         }
         @Override
         public void run() {
             for(String location: mLocations){
-                WeatherForecastContainer forecastContainer = WeatherForecastContainer.getInstance();
-                WeatherModel weatherModel = forecastContainer.getWeatherModels(location).get(0);
 
-                CityModel cityModel = CityModel.makeFrom(weatherModel);
-
-                if(cityModel != null) {
+                WeatherModel weatherModel = TodayWeatherContainer.getInstance().getWeatherModel(location);
+                if(weatherModel != null){
                     Message msg = mHandler.obtainMessage();
-                    msg.obj = cityModel;
+                    msg.obj = weatherModel;
                     msg.what = ADD_CITY;
                     mHandler.sendMessage(msg);
                 }
+
             }
         }
     }
 
+    //TODO: DO IT!
     class FetchWeatherPeriodically implements Runnable{
         @Override
         public void run(){
-            synchronized (mCityModels){
-                for (int i = 0; i < mCityModels.size(); i++){
-                    fetchWeather(mCityModels.get(i));
+            synchronized (mModels){
+                for (int i = 0; i < mModels.size(); i++){
+                    fetchWeather(mModels.get(i));
                 }
             }
 
         }
 
-        private void fetchWeather(final CityModel cityModel){
-            DataService dataService = new OpenWeatherDataService();
-            String location = cityModel.key;
+        private void fetchWeather(final WeatherModel model){
 
-            dataService.getWeatherByLatLng(location, new FutureTaskListener<WeatherModel>() {
-                @Override
-                public void onCompletion(WeatherModel result) {
-                    try {
-                        cityModel.currentTemp = String.valueOf(result.temp);
-                        Message msg = mHandler.obtainMessage();
-                        msg.what = UPDATE_WEATHER;
-                        mHandler.sendMessage(msg);
-
-                    }catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
         }
     }
 
@@ -257,80 +231,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
 
         private void fetch(){
             Message msg = mHandler.obtainMessage();
-            msg.what = UPDATE_CITY_TIME;
-            mHandler.sendMessage(msg);
-        }
-    }
-
-    /**
-     * load current local time of that city, city name, and current temperature.
-     */
-    private class CityLoadRunnable implements Runnable{
-
-        private String mLocation;
-        public CityLoadRunnable(String location){
-            mLocation = location;
-        }
-        @Override
-        public void run() {
-            Logger.d(TAG, "run");
-            load(mLocation);
-        }
-
-        private void load(String location){
-            fetchWeather(location);
-        }
-
-        private void fetchLocalTime(final CityModel model){
-            PlaceService placeService = new GooglePlaceService();
-            Logger.d(TAG, model.latlng);
-
-            placeService.getLocalTime(model.latlng, new FutureTaskListener<LocalTimeModel>() {
-                @Override
-                public void onCompletion(LocalTimeModel result) {
-                    Logger.d(TAG, result.timeZoneId);
-                    model.timeZoneId = result.timeZoneId;
-                    post(model);
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
-        }
-
-        private void fetchWeather(final String location){
-            DataService dataService = new OpenWeatherDataService();
-            dataService.getWeatherByLatLng(location, new FutureTaskListener<WeatherModel>() {
-                @Override
-                public void onCompletion(WeatherModel result) {
-                    CityModel model = CityModel.makeFrom(result);
-                    fetchLocalTime( model );
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-
-                }
-
-                @Override
-                public void onProgress(float progress) {
-
-                }
-            });
-        }
-
-        private void post(CityModel cityModel){
-            Message msg = mHandler.obtainMessage();
-            msg.what = ADD_CITY;
-            msg.obj = cityModel;
-
+            msg.what = UPDATE_TIME;
             mHandler.sendMessage(msg);
         }
     }
@@ -339,10 +240,20 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     Handler mHandler = new Handler(Looper.getMainLooper()){
         public void handleMessage(android.os.Message msg) {
 
+            Bundle reply = msg.getData();
+            String location = reply.getString(FetchTodayWeatherIntentService.FETCH_WEATHER, null);
+            if(location != null){
+                WeatherModel weatherModel = TodayWeatherContainer.getInstance().getWeatherModel(location);
+                mModels.add(weatherModel);
+                mAdapter.notifyDataSetChanged();
+                return;
+            }
+
+
             switch (msg.what){
                 case ADD_CITY:
-                    CityModel model = (CityModel) msg.obj;
-                    mCityModels.add(model);
+                    WeatherModel model = (WeatherModel) msg.obj;
+                    mModels.add(model);
                     mAdapter.notifyDataSetChanged();
                     break;
 
@@ -350,7 +261,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     int index = (int) msg.obj;
                     removeFromSystem(index);
                     break;
-                case UPDATE_CITY_TIME: case UPDATE_WEATHER:
+                case UPDATE_TIME: case UPDATE_WEATHER:
                     mAdapter.notifyDataSetChanged();
                     break;
 
@@ -362,16 +273,11 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     };
 
     private void removeFromSystem(int index){
-        CityModel cityModel = mCityModels.get(index);
-        if(cityModel != null){
-
-            Intent i = new Intent(this, RemoveWeatherIntentService.class);
-            i.putExtra(RemoveWeatherIntentService.REMOVE_LOCATION, cityModel.key);
-            startService(i);
-
-            mCityModels.remove(index);
-            mAdapter.notifyDataSetChanged();
-        }
+        String location = WeatherApp.getLatLngList().get(index);
+        Intent i = new Intent(this, RemoveWeatherIntentService.class);
+        i.putExtra(RemoveWeatherIntentService.REMOVE_LOCATION, location);
+        startService(i);
+        mModels.remove(index);
     }
 
     class ActionModeCallback implements ActionMode.Callback{

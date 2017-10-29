@@ -8,7 +8,7 @@ public final class Constants {
     public static final class ListViewMessages{
         public final static int ADD_CITY    = 1;
         public final static int REMOVE_CITY = 2;
-        public final static int UPDATE_CITY_TIME = 3;
+        public final static int UPDATE_TIME = 3;
         public final static int UPDATE_WEATHER = 4;
     }
 

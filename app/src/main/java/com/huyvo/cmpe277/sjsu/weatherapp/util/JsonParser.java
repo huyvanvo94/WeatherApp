@@ -35,6 +35,7 @@ public class JsonParser {
         JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
         weatherModel.main = JsonHelper.getString(weatherArray, 0, "main");
         weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");
+
         weatherModel.description = JsonHelper.getString(weatherArray, 0, "description");
         if (weatherModel.icon != null) {
             weatherModel.icon = weatherModel.icon.substring(0, weatherModel.icon.length() - 1);
@@ -65,7 +66,6 @@ public class JsonParser {
     public static ArrayList<WeatherModel> parseForecast(String jsonObjectString) {
 
         JSONObject cityArray =  JsonHelper.createJSONObject(jsonObjectString);
-
         JSONObject cityObject = JsonHelper.getJSONObject(cityArray, "city");
 
         String city = JsonHelper.getString(cityObject, "name");
@@ -84,12 +84,11 @@ public class JsonParser {
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
             weatherModel.lat = lat;
             weatherModel.lon = lon;
-            if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") == 6) {
+
+            if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") < 1) {
                 continue;
             }
             weatherModel.country = country;
-
-
             weatherModel.city = city;
 
             weatherModel.pressure = (int) Math.round(JsonHelper.getDouble(jsonObject, "pressure"));
@@ -108,6 +107,7 @@ public class JsonParser {
             JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
             weatherModel.main = JsonHelper.getString(weatherArray, 0, "main");
             weatherModel.description = JsonHelper.getString(weatherArray, 0, "description");
+            weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");
 
             weatherModels.add(weatherModel);
         }
