@@ -42,7 +42,8 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
             TextView localTimeTextView = (TextView) convertView.findViewById(R.id.local_time);
 
             int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
-            int itemColor = backgroundColors[cityModel.index % 9];
+
+            int itemColor = backgroundColors[cityModel.colorIndex];
 
             cityNameTextView.setText(cityModel.cityName);
             //hardcoded Fahrenheit for now
@@ -61,6 +62,11 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
                         icon_partly_cloudy.setBounds(0, 0, 400, 400);
                         cityNameTextView.setCompoundDrawables(null, null, icon_partly_cloudy,null);
                         break;
+                    case("09"): //shower cond
+                        Drawable icon_shower = getContext().getDrawable(R.drawable.icon_rain);
+                        icon_shower.setBounds(0, 0, 400, 400);
+                        cityNameTextView.setCompoundDrawables(null, null, icon_shower, null);
+                        break;
                     case("10"): //rain cond
                         Drawable icon_rain = getContext().getDrawable(R.drawable.icon_rain);
                         icon_rain.setBounds(0,0, 400, 400);
@@ -74,6 +80,11 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
                         Drawable icon_snowy = getContext().getDrawable(R.drawable.icon_snowy);
                         icon_snowy.setBounds(0, 0, 400, 400);
                         cityNameTextView.setCompoundDrawables(null, null, icon_snowy, null);
+                        break;
+                    case("50"): //mist cond
+                        Drawable icon_mist = getContext().getDrawable(R.drawable.icon_mist);
+                        icon_mist.setBounds(0, 0, 400, 400);
+                        cityNameTextView.setCompoundDrawables(null, null, icon_mist, null);
                         break;
                 }
 

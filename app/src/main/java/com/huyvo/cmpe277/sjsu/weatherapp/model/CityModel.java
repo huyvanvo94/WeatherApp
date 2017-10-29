@@ -4,6 +4,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Configurations;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 
 import java.util.Comparator;
+import java.util.Random;
 
 // A simple city model class
 public class CityModel implements BaseModel, Comparator<CityModel> {
@@ -11,7 +12,7 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
     public String currentTemp;
     public String latlng;
     public String icon;
-    public int index;
+    public int colorIndex;
 
     public String location;
 
@@ -28,6 +29,9 @@ public class CityModel implements BaseModel, Comparator<CityModel> {
         cityModel.cityName = weatherModel.city;
         cityModel.icon = weatherModel.icon;
         cityModel.latlng = weatherModel.lat+","+weatherModel.lon;
+
+        Random rand = new Random();
+        cityModel.colorIndex = rand.nextInt(10);
         if(weatherModel.temp_day != 0.0){
             cityModel.currentTemp = String.valueOf((int) weatherModel.temp_day);
         }else{
