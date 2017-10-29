@@ -43,7 +43,7 @@ public class CityViewAdapter extends ArrayAdapter<CityModel>{
 
             int[] backgroundColors = getContext().getResources().getIntArray(R.array.backgroundcolors);
 
-            int itemColor = backgroundColors[cityModel.colorIndex];
+            int itemColor = backgroundColors[2];
 
             cityNameTextView.setText(cityModel.cityName);
             //hardcoded Fahrenheit for now

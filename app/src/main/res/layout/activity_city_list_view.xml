@@ -1,39 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000"
-        tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity">
-
-        <ListView
-            android:id="@+id/list_city_view"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:divider="#ffffff"
-            android:dividerHeight="0.1dp"/>
+    <ListView
+        android:id="@+id/list_city_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:divider="#ffffff"
+        android:dividerHeight="0.1dp"/>
 
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_add_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="@dimen/fab_margin"
-            android:scaleType="fitXY"
-            app:backgroundTint="@color/blue"
-            android:src="@drawable/ic_add_white"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:scaleType="fitXY"
+        app:backgroundTint="@color/blue"
+        android:src="@drawable/ic_add_white"/>
 
 
-    </RelativeLayout>
-
-</ScrollView>
-
+</RelativeLayout>

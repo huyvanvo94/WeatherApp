@@ -5,7 +5,7 @@
 
         <!-- Set theme colors from http://www.google.com/design/spec/style/color.html#color-color-palette-->
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">#000</item>
+        <item name="colorPrimary">#00b7ff</item>
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">#1976D2</item>
         <!-- colorAccent is used as the default value for colorControlActivated

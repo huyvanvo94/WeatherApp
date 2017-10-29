@@ -229,7 +229,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                             try {
                                 WeatherModel weatherModel = JsonParser.parseWeather(response);
                                 cityModel.currentTemp = String.valueOf(weatherModel.temp);
-                                cityModel.colorIndex = weatherModel.colorIndex;
 
                                 Message msg = mHandler.obtainMessage();
                                 msg.what = UPDATE_WEATHER;
