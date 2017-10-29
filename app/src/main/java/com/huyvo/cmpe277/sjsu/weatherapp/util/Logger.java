@@ -2,12 +2,15 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
 import android.util.Log;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.service.FetchForecastIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.VolleyNetworkService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,10 +28,13 @@ public final class Logger {
             WeatherFragment.TAG,
             WeatherApp.TAG,
             WeatherForecastContainer.TAG,
-            FetchForecastIntentService.TAG
+            FetchForecastIntentService.TAG,
+            OpenWeatherDataService.TAG,
+            VolleyNetworkService.TAG,
+            UpdateForecastIntentService.TAG
     );
 
-    public static void d(String tag, String msg) {
+    public static synchronized void d(String tag, String msg) {
         if (CLASS_SIMPLE_NAMES.contains(tag)) {
             Log.d(tag, msg);
         }

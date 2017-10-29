@@ -9,21 +9,39 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.huyvo.cmpe277.sjsu.weatherapp.Singleton;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 /**
  * Created by Huy Vo on 10/22/17.
  */
 
 public class VolleyNetworkService extends Singleton implements NetworkService {
+
+    public final static String TAG = VolleyNetworkService.class.getSimpleName();
+
     private static final int VOLLEY_TIME_OUT = 3000;
     private static final int NUMBER_OF_RETRY = 0;
 
     private final RequestQueue mfRequestQueue;
 
-    public VolleyNetworkService(){
+    private static VolleyNetworkService instance;
+
+    static {
+        instance = new VolleyNetworkService();
+    }
+
+
+    private VolleyNetworkService(){
+        Logger.d(TAG, "constructor");
 
         mfRequestQueue = Volley.newRequestQueue(WeatherApp.getInstance());
     }
+
+    public synchronized static VolleyNetworkService getInstance(){
+        Logger.d(TAG, "getInstance");
+        return instance;
+    }
+
     @Override
     public void cancel(String tag) {
 
