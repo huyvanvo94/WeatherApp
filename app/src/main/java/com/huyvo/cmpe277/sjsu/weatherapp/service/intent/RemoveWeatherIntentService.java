@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp.service;
+package com.huyvo.cmpe277.sjsu.weatherapp.service.intent;
 
 import android.app.IntentService;
 import android.content.Intent;

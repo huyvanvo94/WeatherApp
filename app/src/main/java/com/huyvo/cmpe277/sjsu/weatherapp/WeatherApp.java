@@ -1,11 +1,8 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.app.Application;
-import android.text.TextUtils;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.VolleyNetworkService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +15,13 @@ public class WeatherApp extends Application {
 
     public static final String TAG = "WeatherApp";
     private static Application mApplication;
-    private RequestQueue mRequestQueue;
     private static List<String> mLatLngList;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mApplication = this;
+        VolleyNetworkService.getInstance();
     }
 
     @Override
@@ -38,17 +35,6 @@ public class WeatherApp extends Application {
         return mApplication;
     }
 
-    public <T> void addToRequestQueue(Request<T> req, String tag) {
-        req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
-        getRequestQueue().add(req);
-    }
-
-    public <T> void addToRequestQueue(Request<T> req) {
-        req.setTag(TAG);
-        getRequestQueue().add(req);
-    }
-
-
     public static synchronized List<String> getLatLngList(){
         if(mLatLngList == null){
             mLatLngList = new ArrayList<>();
@@ -56,23 +42,7 @@ public class WeatherApp extends Application {
         return mLatLngList;
     }
 
-    public RequestQueue getRequestQueue() {
-        if (mRequestQueue == null) {
-            mRequestQueue = Volley.newRequestQueue(getApplicationContext());
-        }
-
-        return mRequestQueue;
-    }
-
-    public void cancelPendingRequests() {
-        if (mRequestQueue != null) {
-            mRequestQueue.cancelAll(TAG);
-        }
-    }
-
-    public void cancelPendingRequests(Object tag) {
-        if (mRequestQueue != null) {
-            mRequestQueue.cancelAll(tag);
-        }
+    public void cancelAll(){
+       VolleyNetworkService.getInstance().cancelAll();
     }
 }

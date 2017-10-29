@@ -1,5 +1,6 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 
 import org.json.JSONArray;
@@ -14,6 +15,15 @@ import static com.huyvo.cmpe277.sjsu.weatherapp.util.JsonHelper.createJSONObject
  */
 
 public class JsonParser {
+    public static LocalTimeModel parse(JSONObject jsonObject){
+        LocalTimeModel timeModel = new LocalTimeModel();
+        timeModel.timeZoneId = JsonHelper.getString(jsonObject, "timeZoneId");
+        return timeModel;
+    }
+    public static LocalTimeModel parse(String jsonObjectString){
+        JSONObject jsonObject = createJSONObject(jsonObjectString);
+        return parse(jsonObject);
+    }
     public static WeatherModel parseWeather(String jsonObjectString) {
         JSONObject jsonObject = createJSONObject(jsonObjectString);
         return jsonObject == null ? null : parseWeather(jsonObject);

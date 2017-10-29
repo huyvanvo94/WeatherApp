@@ -13,11 +13,10 @@ import java.util.ArrayList;
  */
 
 public class OpenWeatherDataService implements DataService{
+    public final static String TAG = OpenWeatherDataService.class.getSimpleName();
 
-    private final NetworkService mfNetworkService;
 
     public OpenWeatherDataService(){
-        mfNetworkService = new VolleyNetworkService();
     }
 
     /*Can fetch weather using imperial or metric*/
@@ -25,9 +24,9 @@ public class OpenWeatherDataService implements DataService{
     public void getWeatherByLatLng(String location,final FutureTaskListener<WeatherModel> listener) {
         String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
 
-        Logger.d("OpenWeatherDataService", "getWeather");
+        Logger.d(TAG, "getWeather");
 
-        mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
+        VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
                 Log.d("OpenWeatherDataSercive", "result = " + result);
@@ -51,15 +50,14 @@ public class OpenWeatherDataService implements DataService{
     @Override
     public void getForecastByLatLng(String latLng, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
 
+        Logger.d(TAG, "getForecast");
         String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
 
-        mfNetworkService.getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
+        VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
-               // Log.d("OpenWeather", result);
                 ArrayList<WeatherModel> weatherModels = JsonParser.parseForecast(result);
 
-                Log.d("OpenWeather", weatherModels.toString());
                 if (result == null) {
                     listener.onError("Json error");
                 } else {

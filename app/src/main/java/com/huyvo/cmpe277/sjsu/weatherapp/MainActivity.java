@@ -8,7 +8,6 @@ import android.os.Messenger;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,18 +15,28 @@ import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.Postable;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.UpdateForecastIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Constants;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_EMPTY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_MANY;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD_ONCE_AT_A_TIME;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
+import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
 public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
 
@@ -40,7 +49,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Logger.d(TAG, "onCreate");
+      //  Logger.d(TAG, "onCreate");
         initUI();
 
         Intent i = getIntent();
@@ -50,10 +59,9 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         if(!mLocations.isEmpty()){
             postFinishedListener = new PostForecastRunnable(mLocations);
             new Thread((Runnable) postFinishedListener).start();
-            /**
-
+            // Update Every 3 hours if user is on screen
             ScheduledExecutorService executorService= Executors.newScheduledThreadPool(1);
-            executorService.scheduleAtFixedRate(new UpdateForecastPeriodicallyRunnable(), 0, 2, TimeUnit.SECONDS);*/
+            executorService.scheduleAtFixedRate(new UpdateForecastPeriodicallyRunnable(), 0, 3, TimeUnit.HOURS);
         }
 
 
@@ -100,8 +108,13 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Logger.d(TAG, "onPageScrolled="+position);
+       // Logger.d(TAG, "onPageScrolled="+position);
 
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Logger.d(TAG, "onPageSelected="+position);
         WeatherForecastContainer container = WeatherForecastContainer.getInstance();
         boolean shouldRequestFetchWeather = container.shouldRequestFetchWeather(WeatherApp.getLatLngList().get(position));
         if(shouldRequestFetchWeather){
@@ -111,23 +124,8 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     }
 
     @Override
-    public void onPageSelected(int position) {
-        Logger.d(TAG, "onPageSelected="+position);
-
-    }
-
-    @Override
     public void onPageScrollStateChanged(int state) {
 
-    }
-
-    public final class Messages{
-        public static final int ADD         = 1;
-        public static final int ADD_EMPTY   = 2;
-        public static final int ADD_ONCE_AT_A_TIME = 3;
-        public static final int ADD_MANY = 4;
-        public static final int UPDATE = 5;
-        public static final int UPDATE_FORCAST = 6;
     }
 
     class PostForecastRunnable implements Runnable, PostFinishedListener, Postable {
@@ -188,11 +186,15 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     }
 
 
-    class LoadForcastRunnable implements Runnable{
+    class LoadForecastRunnable implements Runnable{
 
         private String mLocation;
-        public LoadForcastRunnable(int position){
+        public LoadForecastRunnable(int position){
             mLocation = WeatherApp.getLatLngList().get(position);
+        }
+
+        public LoadForecastRunnable(String location){
+            mLocation = location;
         }
         @Override
         public void run() {
@@ -207,7 +209,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                 @Override
                 public void onCompletion(ArrayList<WeatherModel> result) {
                     Message message = mHandler.obtainMessage();
-                    message.what = Messages.ADD;
+                    message.what = Constants.MainViewMessages.ADD;
                     message.obj = result;
                     mHandler.sendMessage(message);
                 }
@@ -255,7 +257,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
                         Message msg = mHandler.obtainMessage();
                         msg.obj = result;
-                        msg.what = Messages.UPDATE;
+                        msg.what = Constants.MainViewMessages.UPDATE;
                         mHandler.sendMessage(msg);
                     }
                 }
@@ -294,23 +296,23 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
 
             switch (msg.what){
-                case Messages.ADD:
+                case ADD:
                     List<WeatherModel> models = (List) msg.obj;
 
                     replaceFragmentInAdapter(mPosition, models);
                     setCurrentItem(mPosition);
                     break;
-                case Messages.ADD_EMPTY:
+                case ADD_EMPTY:
 
                     int len = addToAdapter(new WeatherFragment());
 
                     if(mPosition == len-1){
-                        new Thread(new LoadForcastRunnable(mPosition)).start();
+                        new Thread(new LoadForecastRunnable(mPosition)).start();
                     }
 
                     break;
 
-                case Messages.ADD_ONCE_AT_A_TIME:
+                case ADD_ONCE_AT_A_TIME:
                     List<WeatherModel> weatherModels = (List) msg.obj;
                     int aLen = addToAdapter(WeatherFragment.newInstance(weatherModels));
                     if(aLen-1 == mPosition){
@@ -318,7 +320,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                     }
                     postFinishedListener.done();
                     break;
-                case Messages.ADD_MANY:
+                case ADD_MANY:
                     List<WeatherFragment> fragments = (List) msg.obj;
                     for(WeatherFragment f: fragments){
                         addToAdapter(f);
@@ -326,15 +328,14 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
                     setCurrentItem(mPosition);
                     break;
-                case Messages.UPDATE:
+                case UPDATE:
 
                     replaceFragmentInAdapter(mPosition, (List) msg.obj);
 
                     break;
 
-                case Messages.UPDATE_FORCAST:
-                    Log.d("OK", "update");
-                    ForcastInfo info = (ForcastInfo) msg.obj;
+                case UPDATE_FORECAST:
+                    ForecastInfo info = (ForecastInfo) msg.obj;
                     replaceFragmentInAdapter(info.position, info.mList);
                     break;
                 default:
@@ -382,7 +383,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         return wpa.getCount();
     }
 
-    class ForcastInfo{
+    class ForecastInfo{
         public int position;
         public List<WeatherModel> mList;
     }

@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp.model;
+package com.huyvo.cmpe277.sjsu.weatherapp;
 
 /**
  * Created by Huy Vo on 10/26/17.
