@@ -85,6 +85,9 @@ public class JsonParser {
             weatherModel.lat = lat;
             weatherModel.lon = lon;
 
+            if(weatherModels.size() == 5){
+                break;
+            }
             if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") < 1) {
                 continue;
             }
