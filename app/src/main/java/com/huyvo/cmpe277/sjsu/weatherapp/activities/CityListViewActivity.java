@@ -36,55 +36,6 @@ import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentServi
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.RemoveWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.ADD_CITY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.REMOVE_CITY;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_CITY_TIME;
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_WEATHER;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
-import com.huyvo.cmpe277.sjsu.weatherapp.R;
-import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
-import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.CityModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.GooglePlaceService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.PlaceService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.RemoveWeatherIntentService;
-import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
