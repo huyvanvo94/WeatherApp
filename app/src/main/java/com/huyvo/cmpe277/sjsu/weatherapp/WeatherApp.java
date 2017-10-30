@@ -16,6 +16,7 @@ public class WeatherApp extends Application {
     public static final String TAG = "WeatherApp";
     private static Application mApplication;
     private static List<String> mLatLngList;
+    private static List<String> mCityList;
 
     @Override
     public void onCreate() {
@@ -29,7 +30,18 @@ public class WeatherApp extends Application {
         super.onTerminate();
     }
 
+    public static synchronized List<String> getCityList(){
+        if(mCityList == null){
+            mCityList = new ArrayList<>();
+        }
 
+        return mCityList;
+    }
+
+    public synchronized static String findCity(String location){
+        int index = mLatLngList.indexOf(location);
+        return mCityList.get(index);
+    }
 
     public static synchronized Application getInstance() {
         return mApplication;

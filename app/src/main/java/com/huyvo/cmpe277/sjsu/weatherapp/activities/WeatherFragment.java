@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class WeatherFragment extends Fragment {
     private View v;
     private WeatherModel today;
     private List<WeatherModel> mFiveDaysForecastList;
+    private ForecastViewAdapter mForecastViewAdapter;
     
     public WeatherFragment() {
 
@@ -49,7 +51,7 @@ public class WeatherFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
         setBackgroundColor(today);
         setTodayView(today);
-        //setForecastView(mFiveDaysForecastList);
+        setForecastView(mFiveDaysForecastList);
         return v;
     }
 
@@ -135,6 +137,9 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
+        mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList);
+        ListView forecastListView = (ListView) v.findViewById(R.id.forecast_list);
+        forecastListView.setAdapter(mForecastViewAdapter);
 
         /**
         if(weatherModel.city != null){

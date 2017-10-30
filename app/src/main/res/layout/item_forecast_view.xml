@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/text_view_day"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:textColor="@color/white"
+        android:text="DAY"
+        android:gravity="center"
+        />
+    <TextView
+        android:id="@+id/text_view_day_temp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:textColor="@color/white"
+        android:text="NOON TEMP"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/text_view_temp_range"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.3"
+        android:textColor="@color/white"
+        android:text="TEMP RANGE"
+        android:gravity="center"
+        />
+
+</LinearLayout>

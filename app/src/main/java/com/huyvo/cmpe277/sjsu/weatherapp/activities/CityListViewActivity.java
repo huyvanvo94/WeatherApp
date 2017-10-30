@@ -76,6 +76,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         mFabAddCity.setOnClickListener(this);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+
     }
 
     private void load(List<String> locations){
@@ -119,13 +120,14 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Logger.d(TAG, place.toString());
-
+                final String city = place.getAddress().toString().split(",")[0];
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
                 String location = "lat="+ String.format("%.2f",lat)+"&lon="+String.format("%.2f",lng);
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
+                    WeatherApp.getCityList().add(city);
                     fetchTodayWeather(location);
                     fetchForecastWeather(location);
                 }
@@ -255,6 +257,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     WeatherModel model = (WeatherModel) msg.obj;
                     mModels.add(model);
                     mAdapter.notifyDataSetChanged();
+
                     break;
 
                 case REMOVE_CITY:
