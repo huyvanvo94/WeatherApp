@@ -41,7 +41,6 @@ public class FetchForecastIntentService extends IntentService {
                 @Override
                 public void onCompletion(final ArrayList<WeatherModel> result) {
                     if(result != null){
-                        //Logger.d(TAG, "onHandleIntent"+result.toString());
 
                         WeatherForecastContainer.getInstance().put(location, result);
 
