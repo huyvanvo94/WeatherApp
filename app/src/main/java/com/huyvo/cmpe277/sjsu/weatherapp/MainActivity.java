@@ -1,6 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
@@ -112,16 +112,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
         Logger.d(TAG, "onPageSelected="+position);
         WeatherForecastContainer container = WeatherForecastContainer.getInstance();
         boolean shouldRequestFetchWeather = container.shouldRequestFetchWeather(WeatherApp.getLatLngList().get(position));
-        if(shouldRequestFetchWeather){
-            mPosition = position;
+        if(true){
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String location = WeatherApp.getLatLngList().get(mPosition);
+                    Logger.d(TAG, position+"");
+                    String location = WeatherApp.getLatLngList().get(position);
                     fetchTodayWeather(location);
                     fetchForecast(location);
                 }
@@ -148,7 +149,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     }
 
-    class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
+    private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
         public LoadAllDataRunnable(List<String> locations){
 
@@ -211,24 +212,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                 location = reply.getString(FetchTodayWeatherIntentService.FETCH_WEATHER, null);
                 if(location != null){
                     WeatherModel model = TodayWeatherContainer.getInstance().getWeatherModel(location);
-                    int position = WeatherApp.getLatLngList().indexOf(model);
+                    int position = WeatherApp.getLatLngList().indexOf(location);
                     updateTodayView(position, model);
+
                     return;
                 }
             }
 
 
             switch (msg.what){
-                case ADD:
-                    List<WeatherModel> models = (List) msg.obj;
-                    updateForecastView(mPosition, models);
-                    setCurrentItem(mPosition);
-                    break;
-
                 case UPDATE:
-
                     updateForecastView(mPosition, (List) msg.obj);
-
                     break;
 
                 case UPDATE_FORECAST:
@@ -241,7 +235,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                         int length = addToAdapter((LoadingPair) msg.obj);
                         postFinishedListener.done();
                         if (length - 1 == mPosition) {
-                            setCurrentItem(mPosition);
+                            new LoadPageAsync().execute();
                         }
                     }
 
@@ -304,4 +298,23 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public List<WeatherModel> mList;
     }
 
+    class LoadPageAsync extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void Void){
+
+            setCurrentItem(mPosition);
+            mPosition = -1;
+        }
+    }
 }
