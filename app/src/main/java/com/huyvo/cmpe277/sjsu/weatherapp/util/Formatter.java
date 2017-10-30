@@ -31,6 +31,14 @@ public class Formatter {
         }
     }
 
+    public String formatTemperatureRange(float temp_min, float temp_max){
+        if(Configurations.isImperial){
+            return String.valueOf((int) temp_min) + " F - " + String.valueOf((int) temp_max) + " F";
+        }else{
+            return String.valueOf((int) temp_min) + " C - " + String.valueOf((int) temp_max) + " C";
+        }
+    }
+
     public String formatHumidity(int humidity){
         return String.valueOf(humidity) + " %";
     }
