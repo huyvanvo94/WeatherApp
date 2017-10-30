@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.SettingsActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
@@ -81,6 +82,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         pager.setAdapter(adapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(pager, true);
+
     }
 
     @Override
@@ -94,8 +96,10 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         switch (item.getItemId()) {
 
             case R.id.weather:
-                Intent i = new Intent(this, CityListViewActivity.class);
-                startActivity(i);
+                startActivity(new Intent(this, CityListViewActivity.class));
+                break;
+            case R.id.setting:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
             default:
