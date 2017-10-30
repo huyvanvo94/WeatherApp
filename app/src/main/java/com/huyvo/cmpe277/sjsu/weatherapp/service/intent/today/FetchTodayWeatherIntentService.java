@@ -9,6 +9,7 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
@@ -53,6 +54,7 @@ public class FetchTodayWeatherIntentService extends IntentService {
                             @Override
                             public void onCompletion(LocalTimeModel resultLocalTime) {
                                 result.location = location;
+                                result.city = WeatherApp.findCity(result.location);
                                 result.timeZoneId = resultLocalTime.timeZoneId;
 
                                 String city = intent.getStringExtra(CITY);
