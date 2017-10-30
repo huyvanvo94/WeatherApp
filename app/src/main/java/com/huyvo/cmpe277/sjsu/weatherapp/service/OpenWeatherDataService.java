@@ -1,7 +1,5 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
-import android.util.Log;
-
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
@@ -21,7 +19,7 @@ public class OpenWeatherDataService implements DataService{
 
     /*Can fetch weather using imperial or metric*/
     @Override
-    public void getWeatherByLatLng(String location,final FutureTaskListener<WeatherModel> listener) {
+    public void getWeatherByLatLng(String location, final FutureTaskListener<WeatherModel> listener) {
         String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
 
         Logger.d(TAG, "getWeather");
@@ -29,7 +27,6 @@ public class OpenWeatherDataService implements DataService{
         VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
-                Log.d("OpenWeatherDataSercive", "result = " + result);
                 listener.onCompletion(JsonParser.parseWeather(result));
             }
 
@@ -77,5 +74,6 @@ public class OpenWeatherDataService implements DataService{
         });
 
     }
+
 
 }
