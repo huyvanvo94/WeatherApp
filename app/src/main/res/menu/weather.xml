@@ -7,6 +7,6 @@
         android:orderInCategory="0"
         app:showAsAction="always"
         android:id="@+id/weather"
-        android:icon="@drawable/add_city_weather"
+        android:icon="@drawable/ic_list_white"
         android:title="@string/app_name"/>
 </menu>

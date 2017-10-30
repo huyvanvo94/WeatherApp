@@ -116,7 +116,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         Logger.d(TAG, "onPageSelected="+position);
         WeatherForecastContainer container = WeatherForecastContainer.getInstance();
         boolean shouldRequestFetchWeather = container.shouldRequestFetchWeather(WeatherApp.getLatLngList().get(position));
-        if(true){
+        if(shouldRequestFetchWeather){
 
             new Thread(new Runnable() {
                 @Override

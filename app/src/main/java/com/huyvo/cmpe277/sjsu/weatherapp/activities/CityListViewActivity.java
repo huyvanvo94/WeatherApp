@@ -1,5 +1,6 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.support.v7.app.AlertDialog;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -176,15 +178,23 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
         Logger.d(TAG, "onItemLongClick");
         //startActionMode(mCallback);
-        removeFromSystem(i);
 
+        new AlertDialog.Builder(this)
+                .setTitle("Delete City")
+                .setMessage("Are you sure you want to delete city")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeFromSystem(i);
+                    }
+                }).setNegativeButton("No", null).show();
         return false;
     }
 
-    class LoadDataRunnable implements Runnable{
+    private class LoadDataRunnable implements Runnable{
 
         private List<String> mLocations;
 
