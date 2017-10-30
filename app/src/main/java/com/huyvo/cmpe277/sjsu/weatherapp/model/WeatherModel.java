@@ -9,7 +9,6 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 public class WeatherModel implements BaseModel {
     public static final int NO_RESOURCE = -1;
     public long dt;
-    public int colorIndex;
     public int humidity;
     public int pressure;
     public float windSpeed;

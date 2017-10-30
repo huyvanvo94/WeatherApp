@@ -1,6 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -88,6 +89,7 @@ public class WeatherFragment extends Fragment {
         Logger.d(TAG, weatherModel.city);
 
         Formatter formatter = new Formatter();
+
         TextView cityNameTextView = (TextView) v.findViewById(R.id.textview_city_name);
         cityNameTextView.setText(weatherModel.city);
 
@@ -97,6 +99,33 @@ public class WeatherFragment extends Fragment {
 
         TextView todayTemp = (TextView) v.findViewById(R.id.text_view_today_temp);
         todayTemp.setText(formatter.formatTemperature(weatherModel.temp));
+
+        TextView todayCond = (TextView) v.findViewById(R.id.text_view_cond);
+        todayCond.setText(weatherModel.main);
+
+        TextView todayMinTemp = (TextView) v.findViewById(R.id.text_view_min_temp);
+        todayMinTemp.setText(formatter.formatMinTemperature(weatherModel.temp_min));
+
+        TextView todayMaxTemp = (TextView) v.findViewById(R.id.text_view_max_temp);
+        todayMaxTemp.setText(formatter.formatMaxTemperature(weatherModel.temp_max));
+
+        Drawable humidIcon = getContext().getDrawable(R.drawable.icon_humidity);
+        humidIcon.setBounds(0,0, 75, 75);
+        TextView todayHumidity = (TextView) v.findViewById(R.id.text_view_humidity);
+        todayHumidity.setText(formatter.formatHumidity(weatherModel.humidity));
+        todayHumidity.setCompoundDrawables(null, humidIcon, null, null);
+
+        Drawable pressureIcon = getContext().getDrawable(R.drawable.icon_pressure);
+        pressureIcon.setBounds(0,0, 75, 75);
+        TextView todayPressure = (TextView) v.findViewById(R.id.text_view_pressure);
+        todayPressure.setText(formatter.formatPressure(weatherModel.pressure));
+        todayPressure.setCompoundDrawables(null, pressureIcon, null, null);
+
+        Drawable windSpeedIcon = getContext().getDrawable(R.drawable.icon_wind);
+        windSpeedIcon.setBounds(0,0, 75, 75);
+        TextView todayWindSpeed = (TextView) v.findViewById(R.id.text_view_windspeed);
+        todayWindSpeed.setText(formatter.formatWindSpeed(weatherModel.windSpeed));
+        todayWindSpeed.setCompoundDrawables(null, windSpeedIcon, null, null);
     }
 
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){
@@ -105,15 +134,7 @@ public class WeatherFragment extends Fragment {
         if(fiveDaysForecastList == null || v == null){
             return;
         }
-        /*
-        LinearLayout weatherLayout = (LinearLayout) v.findViewById(R.id.weather_layout);
-        ListView forecastView = (ListView) v.findViewById(R.id.five_day_forecast_list);
-        TextView cityNameTextView = (TextView) v.findViewById(R.id.textview_city_name);
-        TextView currentDateTextView = (TextView) v.findViewById(R.id.textview_date);
-        TextView currentTempTextView = (TextView) v.findViewById(R.id.textview_temp);
-        TextView humidityTextView = (TextView) v.findViewById(R.id.textview_humidity);
-        TextView pressureTextView = (TextView) v.findViewById(R.id.textview_pressure);
-        TextView windSpeedTextView = (TextView) v.findViewById(R.id.textview_windspeed);*/
+
 
         /**
         if(weatherModel.city != null){
