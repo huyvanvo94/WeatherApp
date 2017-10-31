@@ -8,7 +8,10 @@ import android.support.v7.app.AppCompatActivity;
  * Created by Huy Vo on 9/16/17.
  */
 
-public class BaseActivityWithFragment extends AppCompatActivity{
+public abstract class BaseActivityWithFragment extends AppCompatActivity{
+    protected abstract void onLoadUI();
+    protected abstract void onFetchPeriodically();
+    protected abstract void onLoadData();
 
     public void showFragment(int containerResId, Fragment fragment){
         showFragment(containerResId, fragment, false, false);

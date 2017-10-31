@@ -56,16 +56,14 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_list_view);
         Logger.d(TAG, "onCreate");
-
-        initUI();
-        load(WeatherApp.getLatLngList());
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
-        executorService.scheduleAtFixedRate(new FetchLocalTimePeriodically(), 0, 1, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
+        onLoadUI();
+        onLoadData();
+        onFetchPeriodically();
     }
 
-    private void initUI(){
+    @Override
+    protected void onLoadUI(){
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Cities");
 
@@ -79,6 +77,18 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
 
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+        executorService.scheduleAtFixedRate(new FetchLocalTimePeriodically(), 0, 1, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
+    }
+
+    @Override
+    protected void onLoadData() {
+        load(WeatherApp.getLatLngList());
     }
 
     private void load(List<String> locations){

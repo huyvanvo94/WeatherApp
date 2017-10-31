@@ -41,48 +41,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
       //  Logger.d(TAG, "onCreate");
-        initUI();
+        onLoadUI();
 
         Intent i = getIntent();
         mPosition = i.getIntExtra("position", -1);
-
-        List<String> mLocations = WeatherApp.getLatLngList();
-        if(!mLocations.isEmpty()){
-            postFinishedListener = new LoadAllDataRunnable(mLocations);
-            new Thread((Runnable) postFinishedListener).start();
-            // Update Every 3 hours if user is on screen
-            /**
-            ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-            executorService.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (WeatherApp.getLatLngList()) {
-
-                        for (String location : WeatherApp.getLatLngList()) {
-                            fetchForecast(location);
-                            fetchTodayWeather(location);
-                        }
-                    }
-                }
-            }, 0, 3, TimeUnit.HOURS);*/
-        }
+        onLoadData();
 
     }
 
     public void setCurrentItem(int position){
         ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
         pager.setCurrentItem(position);
-    }
-
-
-    private void initUI(){
-        ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
-        pager.addOnPageChangeListener(this);
-        PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
-        pager.setAdapter(adapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(pager, true);
-
     }
 
     @Override
@@ -151,6 +120,45 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    protected void onLoadUI() {
+        ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
+        pager.addOnPageChangeListener(this);
+        PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(pager, true);
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+        // Update Every 3 hours if user is on screen
+        /**
+         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+         executorService.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+        synchronized (WeatherApp.getLatLngList()) {
+
+        for (String location : WeatherApp.getLatLngList()) {
+        fetchForecast(location);
+        fetchTodayWeather(location);
+        }
+        }
+        }
+        }, 0, 3, TimeUnit.HOURS);*/
+    }
+
+    @Override
+    protected void onLoadData() {
+        List<String> mLocations = WeatherApp.getLatLngList();
+        if(!mLocations.isEmpty()){
+            postFinishedListener = new LoadAllDataRunnable(mLocations);
+            new Thread((Runnable) postFinishedListener).start();
+            onFetchPeriodically();
+        }
     }
 
     private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
