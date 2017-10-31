@@ -33,6 +33,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +64,18 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Logger.d(TAG, "onResume");
+        ExecutorService refreshService = Executors.newFixedThreadPool(2);
+        refreshService.execute(new FetchLocalTimePeriodically());
+
+       // refreshService.execute(new FetchWeatherPeriodically());
+        refreshService.shutdown();
+
+    }
+
     private void initUI(){
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Cities");
@@ -77,6 +90,13 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
 
     private void load(List<String> locations){
         Logger.d(TAG, String.valueOf(locations.size()));
@@ -159,6 +179,10 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
+            case R.id.menu_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -218,7 +242,9 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
 
         private void fetchWeather(final WeatherModel model){
-
+            Message msg = mHandler.obtainMessage();
+            msg.what = UPDATE_WEATHER;
+            mHandler.sendMessage(msg);
         }
     }
 

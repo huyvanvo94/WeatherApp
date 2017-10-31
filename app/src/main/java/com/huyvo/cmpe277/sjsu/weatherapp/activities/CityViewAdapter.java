@@ -52,7 +52,6 @@ public class CityViewAdapter extends ArrayAdapter<WeatherModel>{
             ListItemLayout.setBackgroundColor(itemColor);
 
             cityNameTextView.setText(model.city);
-            //hardcoded Fahrenheit for now
             currentTempTextView.setText(formatter.formatTemperature(model.temp));
 
             /**

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,6 +8,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity">
+
+<android.support.v7.widget.ActionMenuView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.view.menu.ActionMenuItemView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:title="Item"/>
+</android.support.v7.widget.ActionMenuView>
 
     <ListView
         android:id="@+id/list_city_view"
