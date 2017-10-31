@@ -5,13 +5,29 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
  */
 
 public class Configurations {
-    public static boolean isImperial = true;
+    private static boolean isImperial = true;
+
+
+    public synchronized static void setUnit(int value){
+        if(value == PreferenceManager.Units.IMPERIAL){
+            isImperial = true;
+        }else{
+            isImperial = false;
+        }
+    }
+
+    public synchronized static void setUnit(boolean b){
+        isImperial = b;
+    }
+
+    public static synchronized boolean isImperial(){
+        return isImperial;
+    }
 
     public synchronized static String getUnit(){
-        if(isImperial){
+        if(isImperial()){
             return "imperial";
         }
-
         return "metric";
     }
 

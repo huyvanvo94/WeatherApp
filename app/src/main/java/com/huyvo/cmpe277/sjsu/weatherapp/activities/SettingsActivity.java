@@ -57,6 +57,20 @@ public class SettingsActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
+    @Override
+    protected void onLoadUI() {
+
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+
+    }
+
+    @Override
+    protected void onLoadData() {
+
+    }
 }
 
 
