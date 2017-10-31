@@ -1,5 +1,6 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.support.v7.app.AlertDialog;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -55,28 +57,25 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_list_view);
         Logger.d(TAG, "onCreate");
-
-        initUI();
-        load(WeatherApp.getLatLngList());
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
-        executorService.scheduleAtFixedRate(new FetchLocalTimePeriodically(), 0, 1, TimeUnit.SECONDS);
-        executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
+        onLoadUI();
+        onLoadData();
+        onFetchPeriodically();
     }
 
     @Override
     protected void onResume(){
         super.onResume();
         Logger.d(TAG, "onResume");
-        ExecutorService refreshService = Executors.newFixedThreadPool(2);
-        refreshService.execute(new FetchLocalTimePeriodically());
 
-       // refreshService.execute(new FetchWeatherPeriodically());
-        refreshService.shutdown();
+       //  ExecutorService refreshService = Executors.newFixedThreadPool(2);
+        // refreshService.execute(new FetchLocalTimePeriodically());
+       //  refreshService.execute(new FetchWeatherPeriodically());
+        // refreshService.shutdown();
 
     }
 
-    private void initUI(){
+    protected void onLoadUI(){
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Cities");
 
@@ -89,6 +88,19 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         mFabAddCity.setOnClickListener(this);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+        executorService.scheduleAtFixedRate(new FetchLocalTimePeriodically(), 0, 1, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new FetchWeatherPeriodically(), 0, 3, TimeUnit.HOURS);
+    }
+
+    @Override
+    protected void onLoadData() {
+        load(WeatherApp.getLatLngList());
     }
 
     @Override
@@ -139,13 +151,14 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Logger.d(TAG, place.toString());
-
+                final String city = place.getAddress().toString().split(",")[0];
                 final double lat = place.getLatLng().latitude;
                 final double lng = place.getLatLng().longitude;
 
                 String location = "lat="+ String.format("%.2f",lat)+"&lon="+String.format("%.2f",lng);
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
+                    WeatherApp.getCityList().add(city);
                     fetchTodayWeather(location);
                     fetchForecastWeather(location);
                 }
@@ -198,15 +211,23 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
         Logger.d(TAG, "onItemLongClick");
         //startActionMode(mCallback);
-        removeFromSystem(i);
 
+        new AlertDialog.Builder(this)
+                .setTitle("Delete City")
+                .setMessage("Are you sure you want to delete city")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeFromSystem(i);
+                    }
+                }).setNegativeButton("No", null).show();
         return false;
     }
 
-    class LoadDataRunnable implements Runnable{
+    private class LoadDataRunnable implements Runnable{
 
         private List<String> mLocations;
 
@@ -281,6 +302,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     WeatherModel model = (WeatherModel) msg.obj;
                     mModels.add(model);
                     mAdapter.notifyDataSetChanged();
+
                     break;
 
                 case REMOVE_CITY:

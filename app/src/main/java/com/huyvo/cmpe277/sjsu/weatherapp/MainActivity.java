@@ -1,6 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.SettingsActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
@@ -24,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.ADD;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
@@ -40,47 +41,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
       //  Logger.d(TAG, "onCreate");
-        initUI();
+        onLoadUI();
 
         Intent i = getIntent();
         mPosition = i.getIntExtra("position", -1);
-
-        List<String> mLocations = WeatherApp.getLatLngList();
-        if(!mLocations.isEmpty()){
-            postFinishedListener = new LoadAllDataRunnable(mLocations);
-            new Thread((Runnable) postFinishedListener).start();
-            // Update Every 3 hours if user is on screen
-            /**
-            ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-            executorService.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (WeatherApp.getLatLngList()) {
-
-                        for (String location : WeatherApp.getLatLngList()) {
-                            fetchForecast(location);
-                            fetchTodayWeather(location);
-                        }
-                    }
-                }
-            }, 0, 3, TimeUnit.HOURS);*/
-        }
+        onLoadData();
 
     }
 
     public void setCurrentItem(int position){
         ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
         pager.setCurrentItem(position);
-    }
-
-
-    private void initUI(){
-        ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
-        pager.addOnPageChangeListener(this);
-        PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
-        pager.setAdapter(adapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(pager, true);
     }
 
     @Override
@@ -94,8 +65,10 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         switch (item.getItemId()) {
 
             case R.id.weather:
-                Intent i = new Intent(this, CityListViewActivity.class);
-                startActivity(i);
+                startActivity(new Intent(this, CityListViewActivity.class));
+                break;
+            case R.id.setting:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
             default:
@@ -112,16 +85,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
         Logger.d(TAG, "onPageSelected="+position);
         WeatherForecastContainer container = WeatherForecastContainer.getInstance();
         boolean shouldRequestFetchWeather = container.shouldRequestFetchWeather(WeatherApp.getLatLngList().get(position));
         if(shouldRequestFetchWeather){
-            mPosition = position;
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String location = WeatherApp.getLatLngList().get(mPosition);
+                    Logger.d(TAG, position+"");
+                    String location = WeatherApp.getLatLngList().get(position);
                     fetchTodayWeather(location);
                     fetchForecast(location);
                 }
@@ -148,7 +122,46 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     }
 
-    class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
+    @Override
+    protected void onLoadUI() {
+        ViewPager pager = (ViewPager) findViewById(R.id.city_viewpager);
+        pager.addOnPageChangeListener(this);
+        PagerAdapter adapter = new WeatherPageAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(pager, true);
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+        // Update Every 3 hours if user is on screen
+        /**
+         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+         executorService.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+        synchronized (WeatherApp.getLatLngList()) {
+
+        for (String location : WeatherApp.getLatLngList()) {
+        fetchForecast(location);
+        fetchTodayWeather(location);
+        }
+        }
+        }
+        }, 0, 3, TimeUnit.HOURS);*/
+    }
+
+    @Override
+    protected void onLoadData() {
+        List<String> mLocations = WeatherApp.getLatLngList();
+        if(!mLocations.isEmpty()){
+            postFinishedListener = new LoadAllDataRunnable(mLocations);
+            new Thread((Runnable) postFinishedListener).start();
+            onFetchPeriodically();
+        }
+    }
+
+    private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
         public LoadAllDataRunnable(List<String> locations){
 
@@ -211,24 +224,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                 location = reply.getString(FetchTodayWeatherIntentService.FETCH_WEATHER, null);
                 if(location != null){
                     WeatherModel model = TodayWeatherContainer.getInstance().getWeatherModel(location);
-                    int position = WeatherApp.getLatLngList().indexOf(model);
+                    int position = WeatherApp.getLatLngList().indexOf(location);
                     updateTodayView(position, model);
+
                     return;
                 }
             }
 
 
             switch (msg.what){
-                case ADD:
-                    List<WeatherModel> models = (List) msg.obj;
-                    updateForecastView(mPosition, models);
-                    setCurrentItem(mPosition);
-                    break;
-
                 case UPDATE:
-
                     updateForecastView(mPosition, (List) msg.obj);
-
                     break;
 
                 case UPDATE_FORECAST:
@@ -241,7 +247,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                         int length = addToAdapter((LoadingPair) msg.obj);
                         postFinishedListener.done();
                         if (length - 1 == mPosition) {
-                            setCurrentItem(mPosition);
+                            new LoadPageAsync().execute();
                         }
                     }
 
@@ -304,4 +310,23 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         public List<WeatherModel> mList;
     }
 
+    class LoadPageAsync extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void Void){
+
+            setCurrentItem(mPosition);
+            mPosition = -1;
+        }
+    }
 }

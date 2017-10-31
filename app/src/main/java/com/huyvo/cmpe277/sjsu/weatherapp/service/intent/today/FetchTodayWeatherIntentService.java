@@ -9,6 +9,7 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
+import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.DataService;
@@ -23,6 +24,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.service.PlaceService;
 
 public class FetchTodayWeatherIntentService extends IntentService {
     public final static String FETCH_WEATHER = "com.huyvo.cmpe277.weatherapp.fetch_weather";
+    public final static String CITY = "com.huyvo.city";
     public final static String WHO = "com.huyvo.cmpe277.weatherapp.who";
 
     public final static String TAG = FetchTodayWeatherIntentService.class.getSimpleName();
@@ -51,7 +53,15 @@ public class FetchTodayWeatherIntentService extends IntentService {
                         placeService.getLocalTime(result.lat+","+result.lon, new FutureTaskListener<LocalTimeModel>() {
                             @Override
                             public void onCompletion(LocalTimeModel resultLocalTime) {
+                                result.location = location;
+                                result.city = WeatherApp.findCity(result.location);
                                 result.timeZoneId = resultLocalTime.timeZoneId;
+
+                                String city = intent.getStringExtra(CITY);
+                                if(city != null) {
+                                    result.city = city;
+                                }
+
                                 TodayWeatherContainer todayWeatherContainer = TodayWeatherContainer.getInstance();
                                 todayWeatherContainer.put(location, result);
 
