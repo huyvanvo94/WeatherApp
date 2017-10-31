@@ -41,10 +41,10 @@
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait"
-            android:parentActivityName=".activities.BaseActivityWithFragment">
+            android:parentActivityName=".activities.CityListViewActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment" />
+                android:value="com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity" />
         </activity>
 
         <service

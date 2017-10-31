@@ -3,12 +3,13 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="grey">#afb1b5</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="blue" >#5194ff</color>
     <color name="purple" >#FFAA66CC</color>
     <color name="green" >#FF99CC00</color>
-    <color name="orange" >#FFFFBB33</color>
+    <color name="orange" >#F46000</color>
     <color name="darkblue" >#FF0099CC</color>
     <color name="darkpurple" >#FF9933CC</color>
     <color name="darkgreen" >#FF669900</color>

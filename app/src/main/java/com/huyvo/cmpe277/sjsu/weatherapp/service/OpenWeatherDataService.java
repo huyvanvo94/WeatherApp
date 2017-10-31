@@ -1,6 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Configurations;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
@@ -19,8 +20,10 @@ public class OpenWeatherDataService implements DataService{
 
     /*Can fetch weather using imperial or metric*/
     @Override
-    public void getWeatherByLatLng(String location, final FutureTaskListener<WeatherModel> listener) {
-        String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
+    public void getWeatherByLatLng(String location,final FutureTaskListener<WeatherModel> listener) {
+        String url = Configurations.getWeatherRestUrl(location);
+        //String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
+
 
         Logger.d(TAG, "getWeather");
 
@@ -48,7 +51,8 @@ public class OpenWeatherDataService implements DataService{
     public void getForecastByLatLng(String latLng, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
 
         Logger.d(TAG, "getForecast");
-        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
+        String url = Configurations.getForcastRestUrl(latLng);
+       // String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
 
         VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override

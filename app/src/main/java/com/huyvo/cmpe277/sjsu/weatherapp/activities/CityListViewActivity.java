@@ -9,13 +9,13 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.support.v7.app.AlertDialog;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -62,6 +62,18 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+        Logger.d(TAG, "onResume");
+
+
+       //  ExecutorService refreshService = Executors.newFixedThreadPool(2);
+        // refreshService.execute(new FetchLocalTimePeriodically());
+       //  refreshService.execute(new FetchWeatherPeriodically());
+        // refreshService.shutdown();
+
+    }
+
     protected void onLoadUI(){
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -90,6 +102,13 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     protected void onLoadData() {
         load(WeatherApp.getLatLngList());
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
 
     private void load(List<String> locations){
         Logger.d(TAG, String.valueOf(locations.size()));
@@ -173,6 +192,10 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
+            case R.id.menu_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -240,7 +263,9 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
 
         private void fetchWeather(final WeatherModel model){
-
+            Message msg = mHandler.obtainMessage();
+            msg.what = UPDATE_WEATHER;
+            mHandler.sendMessage(msg);
         }
     }
 

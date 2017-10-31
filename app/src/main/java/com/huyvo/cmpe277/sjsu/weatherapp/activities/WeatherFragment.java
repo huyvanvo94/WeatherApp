@@ -44,6 +44,7 @@ public class WeatherFragment extends Fragment {
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -141,34 +142,6 @@ public class WeatherFragment extends Fragment {
         ListView forecastListView = (ListView) v.findViewById(R.id.forecast_list);
         forecastListView.setAdapter(mForecastViewAdapter);
 
-        /**
-        if(weatherModel.city != null){
-            cityNameTextView.setText(weatherModel.city);
-            currentDateTextView.setText(weatherModel.getDayOfTheWeek());
-
-            humidityTextView.setText(weatherModel.humidity + " %");
-            Drawable humidityIcon = getContext().getDrawable(R.drawable.icon_humidity);
-            humidityIcon.setBounds(0,0,100,100);
-            humidityTextView.setCompoundDrawables(null, humidityIcon, null, null);
-
-            pressureTextView.setText(weatherModel.pressure + " hPa");
-            Drawable pressureIcon = getContext().getDrawable(R.drawable.icon_pressure);
-            pressureIcon.setBounds(0,0, 100, 100);
-            pressureTextView.setCompoundDrawables(null, pressureIcon, null, null);
-
-            windSpeedTextView.setText(String.valueOf(weatherModel.windSpeed) + " mph");
-            Drawable windSpeedIcon = getContext().getDrawable(R.drawable.icon_wind);
-            windSpeedIcon.setBounds(0,0,100,100);
-            windSpeedTextView.setCompoundDrawables(null, windSpeedIcon, null, null);
-
-            if(weatherModel.temp_day != 0.0){
-                currentTempTextView.setText(String.valueOf((int)weatherModel.temp_day) + '\u00B0' + " F");
-            }else{
-                currentTempTextView.setText(String.valueOf((int)weatherModel.temp) + '\u00B0' + " F");
-            }
-
-
-        }*/
 
 
     }
