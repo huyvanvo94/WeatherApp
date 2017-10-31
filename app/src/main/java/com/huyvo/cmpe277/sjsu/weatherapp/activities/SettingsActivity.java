@@ -20,4 +20,18 @@ public class SettingsActivity extends BaseActivityWithFragment {
         }
     }
 
+    @Override
+    protected void onLoadUI() {
+
+    }
+
+    @Override
+    protected void onFetchPeriodically() {
+
+    }
+
+    @Override
+    protected void onLoadData() {
+
+    }
 }

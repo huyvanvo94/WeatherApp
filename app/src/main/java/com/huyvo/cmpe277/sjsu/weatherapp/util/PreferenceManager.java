@@ -46,4 +46,26 @@ public class PreferenceManager{
         return datas;
 
     }
+
+    public void save(String key, int value){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.commit();
+    }
+
+    public int getInt(String key){
+        return mSharedPreferences.getInt(key, 1);
+    }
+
+    public final class KeyValue{
+        public final static String UNIT_KEY = "units";
+        public final static String TODAY_WEATHER_KEY = "today";
+        public final static String FORECAST_WEATHER_KEY = "forecast";
+    }
+
+    public final class Units{
+        public final static int IMPERIAL = 1;
+        public final static int METRIC = 0;
+    }
+
 }

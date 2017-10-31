@@ -3,6 +3,9 @@ package com.huyvo.cmpe277.sjsu.weatherapp;
 import android.app.Application;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.service.VolleyNetworkService;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Configurations;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +25,14 @@ public class WeatherApp extends Application {
     public void onCreate() {
         super.onCreate();
         mApplication = this;
+        mLatLngList = new ArrayList<>();
+        mCityList = new ArrayList<>();
+
         VolleyNetworkService.getInstance();
+        PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
+        int unit = preferenceManager.getInt(PreferenceManager.KeyValue.UNIT_KEY);
+        Configurations.setUnit(PreferenceManager.Units.METRIC);
+        Logger.d(TAG, "is imperial: " + Configurations.isImperial());
     }
 
     @Override
@@ -31,10 +41,6 @@ public class WeatherApp extends Application {
     }
 
     public static synchronized List<String> getCityList(){
-        if(mCityList == null){
-            mCityList = new ArrayList<>();
-        }
-
         return mCityList;
     }
 
@@ -48,9 +54,6 @@ public class WeatherApp extends Application {
     }
 
     public static synchronized List<String> getLatLngList(){
-        if(mLatLngList == null){
-            mLatLngList = new ArrayList<>();
-        }
         return mLatLngList;
     }
 
