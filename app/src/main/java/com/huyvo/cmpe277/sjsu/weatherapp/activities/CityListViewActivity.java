@@ -9,13 +9,13 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.AlertDialog;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.support.v7.app.AlertDialog;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -35,7 +35,6 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +65,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     protected void onResume(){
         super.onResume();
         Logger.d(TAG, "onResume");
+
 
        //  ExecutorService refreshService = Executors.newFixedThreadPool(2);
         // refreshService.execute(new FetchLocalTimePeriodically());
