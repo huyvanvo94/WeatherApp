@@ -65,5 +65,13 @@ public class WeatherApp extends Application {
     public void saveUnitChange(boolean b){
         preferenceManager.save(PreferenceManager.KeyValue.UNIT_KEY, b ? 1:0);
     }
+
+    public void saveWeatherData(){
+
+    }
+
+    public void saveForecastData(){
+
+    }
 }
 
