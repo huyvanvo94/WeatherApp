@@ -1,30 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-   >
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.7"
-        android:textColor="@color/black"
-        android:gravity="center_vertical"
+    tools:context="com.huyvo.cmpe277.sjsu.weatherapp.activities.SettingsActivity">
+
+    <Switch
+        android:id="@+id/a_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Temperature"
+        android:textOn="F"
+        android:textOff="C"
         android:textSize="20sp"
-        android:text="Metric Units"/>
-
-        <Switch
-            android:id="@+id/switch_temp_pref"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:gravity="center_vertical"
-            android:showText="true"
-
-            />
-
-    </LinearLayout>
-
-</android.support.constraint.ConstraintLayout>
+        android:showText="true" />
+</RelativeLayout>

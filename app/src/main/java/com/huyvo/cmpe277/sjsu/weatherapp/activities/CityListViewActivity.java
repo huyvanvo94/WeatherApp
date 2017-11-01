@@ -208,6 +208,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         Intent i = new Intent(this, MainActivity.class);
         i.putExtra("position", position);
         startActivity(i);
+        finish();
     }
 
     @Override

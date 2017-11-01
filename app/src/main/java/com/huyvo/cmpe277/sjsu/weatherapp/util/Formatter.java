@@ -10,9 +10,9 @@ import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 public class Formatter {
     public String formatTemperature(float temp){
         if(Configurations.isImperial()){
-            return (int) temp + "\u00B0" + " F";
+            return String.valueOf( (int) temp) + "\u00B0" + " F";
         }else{
-            return (int) convertFtoC(temp) + "\u00B0" + " C";
+            return String.valueOf((int) convertFtoC(temp)) + "\u00B0" + " C";
 
         }
         /**
@@ -27,9 +27,9 @@ public class Formatter {
     public String formatMaxTemperature(float temp_max){
 
         if(Configurations.isImperial()){
-            return "Max: " + (int) temp_max + "\u00B0" + " F";
+            return "Max: " + String.valueOf( (int) temp_max) + "\u00B0" + " F";
         }else {
-            return "Max: " + (int) convertFtoC(temp_max)+ "\u00B0" + " C";
+            return "Max: " +String.valueOf ( (int) convertFtoC(temp_max))+ "\u00B0" + " C";
         }
         /**
         if(Configurations.isImperial()){
@@ -41,9 +41,9 @@ public class Formatter {
 
     public String formatMinTemperature(float temp_min){
         if(Configurations.isImperial()){
-            return "Min: " + (int) temp_min + "\u00B0" + " F";
+            return "Min: " + String.valueOf( (int) temp_min ) + "\u00B0" + " F";
         }else{
-            return "Min: " + (int) convertFtoC(temp_min) + "\u00B0" + " C";
+            return "Min: " +String.valueOf( (int) convertFtoC(temp_min)) + "\u00B0" + " C";
         }
 
         /**
@@ -59,9 +59,9 @@ public class Formatter {
     public String formatTemperatureRange(float temp_min, float temp_max){
 
         if(Configurations.isImperial()){
-            return (int) temp_min + " F - " + (int) temp_max + " F";
+            return String.valueOf( (int) temp_min) + " F - " + String.valueOf( (int) temp_max )+ " F";
         }else{
-            return (int) convertFtoC(temp_min) + " C - " + (int) convertFtoC(temp_max) + " C";
+            return String.valueOf( (int) convertFtoC(temp_min)) + " C - " + String.valueOf( (int) convertFtoC(temp_max) ) + " C";
         }
         /**
         if(Configurations.isImperial()){
