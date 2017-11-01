@@ -40,12 +40,15 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      //  Logger.d(TAG, "onCreate");
+        Logger.d(TAG, "onCreate");
+
         onLoadUI();
 
         Intent i = getIntent();
         mPosition = i.getIntExtra("position", -1);
         onLoadData();
+
+
 
     }
 

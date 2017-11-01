@@ -1,5 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.service;
 
+import android.util.Log;
+
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.JsonParser;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
@@ -28,7 +30,8 @@ public class OpenWeatherDataService implements DataService{
         VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
             public void onCompletion(String result) {
-                listener.onCompletion(JsonParser.parseWeather(result));
+                WeatherModel model = JsonParser.parseWeather(result);
+                listener.onCompletion(model);
             }
 
             @Override

@@ -1,5 +1,7 @@
 package com.huyvo.cmpe277.sjsu.weatherapp.model;
 
+import android.location.Address;
+
 import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 
 /**
@@ -47,8 +49,14 @@ public class WeatherModel implements BaseModel {
         if(temp == 0.0){
             return temp_day;
         }
-
         return temp;
+    }
+
+    public boolean isMyLocation(Address address){
+        if (address == null){
+            return false;
+        }
+        return country.equals(address.getCountryCode()) && city.equals(address.getLocality());
     }
 
     public String getLocalTime(){
@@ -68,7 +76,8 @@ public class WeatherModel implements BaseModel {
     @Override
     public String toString() {
         return "WeatherModel{" +
-                "dt=" + dt +
+                "location='" + location + '\'' +
+                ", dt=" + dt +
                 ", humidity=" + humidity +
                 ", pressure=" + pressure +
                 ", windSpeed=" + windSpeed +
@@ -79,14 +88,15 @@ public class WeatherModel implements BaseModel {
                 ", temp_night=" + temp_night +
                 ", temp_eve=" + temp_eve +
                 ", temp_morn=" + temp_morn +
+                ", lat=" + lat +
+                ", lon=" + lon +
                 ", main='" + main + '\'' +
                 ", icon='" + icon + '\'' +
                 ", degree=" + degree +
                 ", country='" + country + '\'' +
                 ", city='" + city + '\'' +
-                ", lat='" + lat + '\'' +
-                ", lon='" + lon + '\'' +
                 ", description='" + description + '\'' +
+                ", timeZoneId='" + timeZoneId + '\'' +
                 '}';
     }
 }

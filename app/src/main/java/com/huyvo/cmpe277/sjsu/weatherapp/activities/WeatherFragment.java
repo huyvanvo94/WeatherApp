@@ -2,6 +2,7 @@ package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -89,7 +90,10 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
-        Logger.d(TAG, weatherModel.city);
+        Address address = WeatherApp.getAddressHere();
+        if(weatherModel.isMyLocation(address)){
+            Logger.d(TAG, "true");
+        }
 
         Formatter formatter = new Formatter();
 

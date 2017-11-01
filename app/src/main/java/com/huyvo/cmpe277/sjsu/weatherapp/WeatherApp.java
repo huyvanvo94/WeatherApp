@@ -1,7 +1,9 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
 import android.app.Application;
+import android.location.Address;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.service.LocationService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.VolleyNetworkService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Configurations;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.PreferenceManager;
@@ -19,6 +21,7 @@ public class WeatherApp extends Application {
     private static Application mApplication;
     private static List<String> mLatLngList;
     private static List<String> mCityList;
+    private static LocationService mLocationService;
 
     private PreferenceManager preferenceManager;
 
@@ -34,6 +37,8 @@ public class WeatherApp extends Application {
         preferenceManager = new PreferenceManager(getApplicationContext());
         int unit = preferenceManager.getInt(PreferenceManager.KeyValue.UNIT_KEY);
         Configurations.setUnit(unit);
+        mLocationService = new LocationService();
+
     }
 
     @Override
@@ -72,6 +77,10 @@ public class WeatherApp extends Application {
 
     public void saveForecastData(){
 
+    }
+
+    public synchronized static Address getAddressHere(){
+        return mLocationService.getAddress(mLocationService.getLastKnownLocation());
     }
 }
 
