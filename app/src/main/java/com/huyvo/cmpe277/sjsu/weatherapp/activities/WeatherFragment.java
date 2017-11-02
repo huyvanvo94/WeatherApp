@@ -93,6 +93,9 @@ public class WeatherFragment extends Fragment {
         Address address = WeatherApp.getAddressHere();
         if(weatherModel.isMyLocation(address)){
             Logger.d(TAG, "true");
+            TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
+            geoLocation.setVisibility(v.VISIBLE);
+            geoLocation.setText("You are here");
         }
 
         Formatter formatter = new Formatter();
@@ -133,6 +136,8 @@ public class WeatherFragment extends Fragment {
         TextView todayWindSpeed = (TextView) v.findViewById(R.id.text_view_windspeed);
         todayWindSpeed.setText(formatter.formatWindSpeed(weatherModel.windSpeed));
         todayWindSpeed.setCompoundDrawables(null, windSpeedIcon, null, null);
+
+
     }
 
     public void setForecastView(List<WeatherModel> fiveDaysForecastList){

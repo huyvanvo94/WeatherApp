@@ -14,6 +14,15 @@
         android:text="Temperature"
         android:textOn="F"
         android:textOff="C"
-        android:textSize="20sp"
-        android:showText="true" />
+        android:textSize="15sp"
+        android:showText="true"
+        android:paddingTop="50dp"
+        android:switchTextAppearance="@style/SwitchTextAppearance"
+        android:switchMinWidth="50dp"
+        android:switchPadding="20dp"
+        android:thumbTextPadding="20dp"
+        android:thumb="@drawable/thumb"
+        android:track="@drawable/track"/>
+
+
 </RelativeLayout>

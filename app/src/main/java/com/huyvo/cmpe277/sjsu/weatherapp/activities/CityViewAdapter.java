@@ -85,6 +85,16 @@ public class CityViewAdapter extends ArrayAdapter<WeatherModel>{
                 icon_partly_cloudy.setBounds(0, 0, 400, 400);
                 cityNameTextView.setCompoundDrawables(null, null, icon_partly_cloudy, null);
                 break;
+            case ("03d"): case "03": //cloudy cond
+                Drawable icon_cloudy = getContext().getDrawable(R.drawable.icon_partly_cloudy);
+                icon_cloudy.setBounds(0, 0, 400, 400);
+                cityNameTextView.setCompoundDrawables(null, null, icon_cloudy, null);
+                break;
+            case ("04d"): case "04": //cloudy cond
+                Drawable icon_broken_clouds = getContext().getDrawable(R.drawable.icon_partly_cloudy);
+                icon_broken_clouds.setBounds(0, 0, 400, 400);
+                cityNameTextView.setCompoundDrawables(null, null, icon_broken_clouds, null);
+                break;
             case ("09d"): case "09": //shower cond
                 Drawable icon_shower = getContext().getDrawable(R.drawable.icon_rain);
                 icon_shower.setBounds(0, 0, 400, 400);

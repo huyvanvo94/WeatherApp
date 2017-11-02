@@ -66,12 +66,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         super.onResume();
         Logger.d(TAG, "onResume");
 
-
-       //  ExecutorService refreshService = Executors.newFixedThreadPool(2);
-        // refreshService.execute(new FetchLocalTimePeriodically());
-       //  refreshService.execute(new FetchWeatherPeriodically());
-        // refreshService.shutdown();
-
     }
 
     protected void onLoadUI(){
