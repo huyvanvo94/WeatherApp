@@ -245,7 +245,6 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     }
 
-    //TODO: DO IT!
     class FetchWeatherPeriodically implements Runnable{
         @Override
         public void run(){

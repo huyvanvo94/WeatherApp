@@ -25,6 +25,8 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
@@ -43,10 +45,8 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         Logger.d(TAG, "onCreate");
 
         onLoadUI();
-
-        Intent i = getIntent();
-        mPosition = i.getIntExtra("position", -1);
         onLoadData();
+        onFetchPeriodically();
 
 
 
@@ -69,9 +69,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
             case R.id.weather:
                 startActivity(new Intent(this, CityListViewActivity.class));
+
                 break;
             case R.id.setting:
                 startActivity(new Intent(this, SettingsActivity.class));
+
                 break;
 
             default:
@@ -81,6 +83,19 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         return true;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        Logger.d(TAG, "onResume");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Message msg = mHandler.obtainMessage();
+                msg.what = UPDATE;
+                mHandler.sendMessage(msg);
+            }
+        }).start();
+    }
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
        // Logger.d(TAG, "onPageScrolled="+position);
@@ -138,8 +153,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     @Override
     protected void onFetchPeriodically() {
         // Update Every 3 hours if user is on screen
+
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+       // executorService.scheduleAtFixedRate(new UpdatePagePeriodically(), 0, 1, TimeUnit.SECONDS);
         /**
-         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
          executorService.scheduleAtFixedRate(new Runnable() {
         @Override
         public void run() {
@@ -156,6 +174,9 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     @Override
     protected void onLoadData() {
+        Intent i = getIntent();
+        mPosition = i.getIntExtra("position", -1);
+
         List<String> mLocations = WeatherApp.getLatLngList();
         if(!mLocations.isEmpty()){
             postFinishedListener = new LoadAllDataRunnable(mLocations);
@@ -237,7 +258,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
             switch (msg.what){
                 case UPDATE:
-                    updateForecastView(mPosition, (List) msg.obj);
+                    updateView();
                     break;
 
                 case UPDATE_FORECAST:
@@ -260,6 +281,12 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         }
     };
 
+    public void updateView(){
+        ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
+        WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
+        wpa.notifyDataSetChanged();
+
+    }
     public int addToAdapter(LoadingPair loadingPair){
         ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();

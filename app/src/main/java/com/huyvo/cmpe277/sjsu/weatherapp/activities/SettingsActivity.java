@@ -36,7 +36,18 @@ public class SettingsActivity extends BaseActivityWithFragment implements Compou
         switch (item.getItemId()) {
 
             case android.R.id.home:
+
+                /*
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+
+
+                    TaskStackBuilder.create(this)
+
+                            .addNextIntentWithParentStack(upIntent)
+
+                            .startActivities(); */
                 NavUtils.navigateUpFromSameTask(this);
+
                 return true;
 
             default:
