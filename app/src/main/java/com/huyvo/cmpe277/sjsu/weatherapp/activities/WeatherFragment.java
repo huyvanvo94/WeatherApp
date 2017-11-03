@@ -27,7 +27,6 @@ public class WeatherFragment extends Fragment {
     private View v;
     private WeatherModel today;
     private List<WeatherModel> mFiveDaysForecastList;
-    private ForecastViewAdapter mForecastViewAdapter;
     private String timeZoneId;
     private List<WeatherModel> mThreeHours;
     public WeatherFragment() {
@@ -84,7 +83,7 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
-
+        ThreeHoursViewAdapter threeHoursViewAdapter = new ThreeHoursViewAdapter(getContext(), mThreeHours, timeZoneId);
 
 
     }
@@ -156,7 +155,7 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
-        mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList, timeZoneId);
+        ForecastViewAdapter mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList, timeZoneId);
         ListView forecastListView = (ListView) v.findViewById(R.id.forecast_list);
         forecastListView.setAdapter(mForecastViewAdapter);
 
