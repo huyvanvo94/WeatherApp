@@ -51,6 +51,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     private ActionMode.Callback mCallback;
+
+    private boolean pause = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,6 +201,10 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     @Override
     public void onItemClick(AdapterView<?> adapter, View view, int position, long l) {
         Logger.d(TAG, "onItemClick " + position);
+
+        if(pause){
+            return;
+        }
         Intent i = new Intent(this, MainActivity.class);
         i.putExtra("position", position);
         startActivity(i);
@@ -209,6 +215,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
         Logger.d(TAG, "onItemLongClick");
         //startActionMode(mCallback);
+        pause = true;
 
         new AlertDialog.Builder(this)
                 .setTitle("Delete City")
@@ -217,8 +224,18 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         removeFromSystem(i);
+                        pause = false;
                     }
-                }).setNegativeButton("No", null).show();
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                pause = false;
+            }
+        }).show();
+
+
+
         return false;
     }
 
@@ -287,6 +304,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 WeatherModel weatherModel = TodayWeatherContainer.getInstance().getWeatherModel(location);
                 mModels.add(weatherModel);
                 mAdapter.notifyDataSetChanged();
+                ListView listView = (ListView) findViewById(R.id.list_city_view);
+                listView.setSelection(mModels.size()-1);
                 return;
             }
 
@@ -297,6 +316,8 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                     mModels.add(model);
                     mAdapter.notifyDataSetChanged();
 
+                    ListView listView = (ListView) findViewById(R.id.list_city_view);
+                    listView.setSelection(mModels.size()-1);
                     break;
 
                 case REMOVE_CITY:

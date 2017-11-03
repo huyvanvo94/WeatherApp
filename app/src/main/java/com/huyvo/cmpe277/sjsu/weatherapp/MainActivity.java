@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     public final static String TAG = "MainActivity";
 
     private PostFinishedListener postFinishedListener;
-    private int mPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +46,6 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         onLoadUI();
         onLoadData();
         onFetchPeriodically();
-
-
 
     }
 
@@ -175,11 +172,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     @Override
     protected void onLoadData() {
         Intent i = getIntent();
-        mPosition = i.getIntExtra("position", -1);
+        int mPosition = i.getIntExtra("position", -1);
 
         List<String> mLocations = WeatherApp.getLatLngList();
         if(!mLocations.isEmpty()){
-            postFinishedListener = new LoadAllDataRunnable(mLocations);
+            postFinishedListener = new LoadAllDataRunnable(mLocations, mPosition);
             new Thread((Runnable) postFinishedListener).start();
             onFetchPeriodically();
         }
@@ -187,9 +184,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
     private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
-        public LoadAllDataRunnable(List<String> locations){
+        private int mPosition;
+        public LoadAllDataRunnable(List<String> locations, int pos){
 
             mLocations = new LinkedList<>(locations);
+            mPosition = pos;
         }
 
         @Override
@@ -226,11 +225,17 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
             }
         }
+
+        @Override
+        public int getPosition() {
+            return mPosition;
+        }
     }
 
 
     interface PostFinishedListener{
         void done();
+        int getPosition();
     }
 
     Handler mHandler = new Handler(){
@@ -270,7 +275,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
 
                         int length = addToAdapter((LoadingPair) msg.obj);
                         postFinishedListener.done();
-                        if (length - 1 == mPosition) {
+                        if (length - 1 == postFinishedListener.getPosition()) {
                             new LoadPageAsync().execute();
                         }
                     }
@@ -355,8 +360,8 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         @Override
         protected void onPostExecute(Void Void){
 
-            setCurrentItem(mPosition);
-            mPosition = -1;
+            setCurrentItem(postFinishedListener.getPosition());
+
         }
     }
 }
