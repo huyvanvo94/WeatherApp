@@ -12,9 +12,9 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseActivityWithFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.SettingsActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
-public class MainActivity extends BaseActivityWithFragment implements ViewPager.OnPageChangeListener{
+public class MainActivity extends WeatherActivity implements ViewPager.OnPageChangeListener{
 
     public final static String TAG = "MainActivity";
 
@@ -42,6 +42,7 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Logger.d(TAG, "onCreate");
+
 
         onLoadUI();
         onLoadData();
@@ -81,6 +82,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         Logger.d(TAG, "onResume");
@@ -112,25 +118,29 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
                     Logger.d(TAG, position+"");
                     String location = WeatherApp.getLatLngList().get(position);
                     fetchTodayWeather(location);
-                    fetchForecast(location);
+                    fetchForecastWeather(location);
                 }
             }).start();
         }
     }
 
-    private void fetchTodayWeather(String location){
+    @Override
+    protected void fetchTodayWeather(String location){
         Intent i = new Intent(this, FetchTodayWeatherIntentService.class);
         i.putExtra(FetchTodayWeatherIntentService.FETCH_WEATHER, location);
         i.putExtra(FetchTodayWeatherIntentService.WHO, new Messenger(mHandler));
         startService(i);
     }
 
-    public void fetchForecast(String location){
+    @Override
+    protected void fetchForecastWeather(String location) {
+
         Intent intent = new Intent(MainActivity.this, UpdateForecastIntentService.class);
         intent.putExtra(UpdateForecastIntentService.WHO, new Messenger(mHandler));
         intent.putExtra(UpdateForecastIntentService.FETCH_FORECAST, location);
         startService(intent);
     }
+
 
     @Override
     public void onPageScrollStateChanged(int state) {
@@ -180,6 +190,11 @@ public class MainActivity extends BaseActivityWithFragment implements ViewPager.
             new Thread((Runnable) postFinishedListener).start();
             onFetchPeriodically();
         }
+    }
+
+    @Override
+    protected void fetchThreeHours(String location) {
+
     }
 
     private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {

@@ -2,7 +2,6 @@ package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,7 +26,7 @@ public class WeatherFragment extends Fragment {
     private WeatherModel today;
     private List<WeatherModel> mFiveDaysForecastList;
     private ForecastViewAdapter mForecastViewAdapter;
-    
+    private String timeZoneId;
     public WeatherFragment() {
 
     }
@@ -36,6 +35,7 @@ public class WeatherFragment extends Fragment {
         WeatherFragment fragment = new WeatherFragment();
         fragment.mFiveDaysForecastList = fiveDaysForecastList;
         fragment.today = today;
+        fragment.timeZoneId = today.timeZoneId;
         return fragment;
     }
 
@@ -90,13 +90,14 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
+        /*
         Address address = WeatherApp.getAddressHere();
         if(weatherModel.isMyLocation(address)){
             Logger.d(TAG, "true");
             TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
-            geoLocation.setVisibility(v.VISIBLE);
+            geoLocation.setVisibility(View.VISIBLE);
             geoLocation.setText("You are here");
-        }
+        }*/
 
         Formatter formatter = new Formatter();
 
@@ -147,11 +148,9 @@ public class WeatherFragment extends Fragment {
             return;
         }
 
-        mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList);
+        mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList, timeZoneId);
         ListView forecastListView = (ListView) v.findViewById(R.id.forecast_list);
         forecastListView.setAdapter(mForecastViewAdapter);
-
-
 
     }
 

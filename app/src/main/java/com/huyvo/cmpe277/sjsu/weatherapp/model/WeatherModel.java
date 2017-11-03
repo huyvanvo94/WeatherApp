@@ -59,18 +59,22 @@ public class WeatherModel implements BaseModel {
         return country.equals(address.getCountryCode()) && city.equals(address.getLocality());
     }
 
+    public String getFutureTime(){
+        return DateHelper.getLocalTime(dt, timeZoneId);
+    }
+
     public String getLocalTime(){
         long unixTime = System.currentTimeMillis() / 1000L;
         return DateHelper.getLocalTime(unixTime, timeZoneId);
     }
 
 
-    public String getDate() {
-        return DateHelper.getDate(dt, "GMT-4", "MMM d");
+    public String getDayOfTheWeekWithTimeZone(){
+        return DateHelper.getDate(dt, timeZoneId, "EEE");
     }
 
-    public String getDayOfTheWeek() {
-        return DateHelper.getDate(dt, "GMT-4", "EEE");
+    public String getDateWithTimeZone(){
+        return DateHelper.getDate(dt, timeZoneId, "MMM d");
     }
 
     @Override

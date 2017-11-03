@@ -10,7 +10,6 @@ import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +28,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchThreeHoursIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.RemoveWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today.FetchTodayWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
@@ -44,13 +44,11 @@ import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_TIME;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.ListViewMessages.UPDATE_WEATHER;
 
-public class CityListViewActivity extends BaseActivityWithFragment implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
+public class CityListViewActivity extends WeatherActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener{
     public final static String TAG = CityListViewActivity.class.getSimpleName();
     private CityViewAdapter mAdapter;
     private final List<WeatherModel> mModels = new ArrayList<>();
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-
-    private ActionMode.Callback mCallback;
 
     private boolean pause = false;
     @Override
@@ -64,18 +62,22 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
     @Override
-    protected void onResume(){
+    public void onResume(){
         super.onResume();
         Logger.d(TAG, "onResume");
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Logger.d(TAG, "onPause");
     }
 
     protected void onLoadUI(){
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Cities");
-
-        mCallback = new ActionModeCallback();
 
         FloatingActionButton mFabAddCity = (FloatingActionButton) findViewById(R.id.fab_add_city);
         mAdapter = new CityViewAdapter(getApplicationContext(), R.layout.item_city_view, mModels);
@@ -97,6 +99,13 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     @Override
     protected void onLoadData() {
         load(WeatherApp.getLatLngList());
+    }
+
+    @Override
+    protected void fetchThreeHours(String location) {
+        Intent intent = new Intent(this, FetchThreeHoursIntentService.class);
+        intent.putExtra(FetchThreeHoursIntentService.FETCH_THREE_HOURS, location);
+        startService(intent);
     }
 
     @Override
@@ -127,14 +136,16 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         }
     }
 
-    private void fetchTodayWeather(String location){
+    @Override
+    protected void fetchTodayWeather(String location){
         Intent intent = new Intent(this, FetchTodayWeatherIntentService.class);
         intent.putExtra(FetchTodayWeatherIntentService.FETCH_WEATHER, location);
         intent.putExtra(FetchTodayWeatherIntentService.WHO, new Messenger(mHandler));
         startService(intent);
     }
 
-    private void fetchForecastWeather(String location){
+    @Override
+    protected void fetchForecastWeather(String location){
         Intent intent = new Intent(this, FetchForecastIntentService.class);
         intent.putExtra(FetchForecastIntentService.FETCH_WEATHER, location);
         startService(intent);
@@ -155,8 +166,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
                 if(!WeatherApp.getLatLngList().contains(location)){
                     WeatherApp.getLatLngList().add(location);
                     WeatherApp.getCityList().add(city);
-                    fetchTodayWeather(location);
-                    fetchForecastWeather(location);
+                    fetch(location);
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -214,7 +224,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
         Logger.d(TAG, "onItemLongClick");
-        //startActionMode(mCallback);
+
         pause = true;
 
         new AlertDialog.Builder(this)
@@ -295,6 +305,7 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
     }
 
 
+
     Handler mHandler = new Handler(Looper.getMainLooper()){
         public void handleMessage(android.os.Message msg) {
 
@@ -343,27 +354,4 @@ public class CityListViewActivity extends BaseActivityWithFragment implements Vi
         mModels.remove(index);
     }
 
-    class ActionModeCallback implements ActionMode.Callback{
-
-        @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            getMenuInflater().inflate(R.menu.content_menu_city_view, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-
-        }
-    }
 }

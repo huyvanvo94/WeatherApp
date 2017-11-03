@@ -11,4 +11,5 @@ import java.util.ArrayList;
 public interface DataService {
     void getForecastByLatLng(String location, FutureTaskListener<ArrayList<WeatherModel>> listener);
     void getWeatherByLatLng(String location, FutureTaskListener<WeatherModel> listener);
+    void getWeatherThreeHoursLatLng(String location, FutureTaskListener<ArrayList<WeatherModel>> listener);
 }

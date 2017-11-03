@@ -42,6 +42,8 @@ public class DateHelper {
         return localTime;
 
     }
+
+
     public static String getDate(long unixTime, String gmtTime, String dateFormat) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(gmtTime));
@@ -53,15 +55,13 @@ public class DateHelper {
     }
 
     public static int numberOfDayFromToday(long unixTime, String gmtTime) {
-        Logger.e("DateHelper", "numberOfDayFromToday\n" + unixTime + "\n" + (System.currentTimeMillis() / 1000));
+
         if (System.currentTimeMillis() > unixTime * 1000) return -1;
 
         String today = getDate(System.currentTimeMillis() / 1000, gmtTime, "EEE");
         int todayAsInteger = convertWeekDayToInteger(today);
         String dayOfTheWeek = getDate(unixTime, gmtTime, "EEE");
         int dayOfTheWeekAsInteger = convertWeekDayToInteger(dayOfTheWeek);
-        Logger.e("DateHelper", "today = " + today + " todayAsInteger = " + todayAsInteger
-                + " dayOfTheWeek = " + dayOfTheWeek + " dayOfTheWeekAsInteger = " + dayOfTheWeekAsInteger);
         int difference = dayOfTheWeekAsInteger - todayAsInteger;
         return difference >= 0 ? difference : difference + 7;
     }

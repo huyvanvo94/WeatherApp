@@ -65,6 +65,9 @@
         <service
             android:name=".service.intent.RemoveWeatherIntentService"
             android:exported="false"/>
+        <service
+            android:name=".service.intent.FetchThreeHoursIntentService"
+            android:exported="false"/>
 
     </application>
 

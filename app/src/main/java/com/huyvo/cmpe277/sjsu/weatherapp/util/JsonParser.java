@@ -15,6 +15,36 @@ import static com.huyvo.cmpe277.sjsu.weatherapp.util.JsonHelper.createJSONObject
  */
 
 public class JsonParser {
+
+    public static ArrayList<WeatherModel> parseThreeHourWeather(String jsonObjectString){
+
+        ArrayList<WeatherModel> weatherModels = new ArrayList<>();
+        JSONArray weatherJsonArray = JsonHelper.getJSONArray(createJSONObject(jsonObjectString), "list");
+        int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
+
+        for(int i = 0; i < length; i++){
+            WeatherModel weatherModel = new WeatherModel();
+            JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
+            weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
+
+            JSONObject mainObject = JsonHelper.getJSONObject(jsonObject, "main");
+            weatherModel.temp_max = (float) JsonHelper.getDouble(mainObject, "temp_max");
+            weatherModel.temp_min = (float) JsonHelper.getDouble(mainObject, "temp_min");
+            weatherModel.temp = (float) JsonHelper.getDouble(mainObject, "temp");
+
+            JSONArray weatherArray = JsonHelper.getJSONArray(jsonObject, "weather");
+            weatherModel.main = JsonHelper.getString(weatherArray, 0, "main");
+            weatherModel.description = JsonHelper.getString(weatherArray, 0, "description");
+            weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");
+
+            weatherModels.add(weatherModel);
+
+        }
+
+        return weatherModels;
+    }
+
+
     public static LocalTimeModel parse(JSONObject jsonObject){
         LocalTimeModel timeModel = new LocalTimeModel();
         timeModel.timeZoneId = JsonHelper.getString(jsonObject, "timeZoneId");
@@ -78,19 +108,14 @@ public class JsonParser {
         JSONArray weatherJsonArray = JsonHelper.getJSONArray(createJSONObject(jsonObjectString), "list");
         int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 1; i < length; i++) {
             WeatherModel weatherModel = new WeatherModel();
             JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
             weatherModel.lat = lat;
             weatherModel.lon = lon;
 
-            if(weatherModels.size() == 5){
-                break;
-            }
-            if (DateHelper.numberOfDayFromToday(weatherModel.dt, "GMT-4") < 1) {
-                continue;
-            }
+
             weatherModel.country = country;
             weatherModel.city = city;
 

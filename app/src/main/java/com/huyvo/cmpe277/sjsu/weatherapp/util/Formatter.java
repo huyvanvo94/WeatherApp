@@ -92,7 +92,7 @@ public class Formatter {
     }
 
     public String formatDate(WeatherModel weatherModel){
-        return weatherModel.getDayOfTheWeek() + " " + weatherModel.getDate();
+        return weatherModel.getDayOfTheWeekWithTimeZone() + " " + weatherModel.getDateWithTimeZone();
     }
 
 

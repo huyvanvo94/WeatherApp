@@ -8,10 +8,20 @@ import android.support.v7.app.AppCompatActivity;
  * Created by Huy Vo on 9/16/17.
  */
 
-public abstract class BaseActivityWithFragment extends AppCompatActivity{
+public abstract class WeatherActivity extends AppCompatActivity{
     protected abstract void onLoadUI();
     protected abstract void onFetchPeriodically();
     protected abstract void onLoadData();
+
+    protected abstract void fetchThreeHours(String location);
+    protected abstract void fetchTodayWeather(String location);
+    protected abstract void fetchForecastWeather(String location);
+
+    protected void fetch(String location){
+        fetchThreeHours(location);
+        fetchTodayWeather(location);
+        fetchForecastWeather(location);
+    }
 
     public void showFragment(int containerResId, Fragment fragment){
         showFragment(containerResId, fragment, false, false);
