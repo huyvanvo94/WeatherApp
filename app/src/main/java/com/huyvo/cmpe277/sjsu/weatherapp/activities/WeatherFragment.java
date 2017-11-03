@@ -2,6 +2,8 @@ package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,15 +29,17 @@ public class WeatherFragment extends Fragment {
     private List<WeatherModel> mFiveDaysForecastList;
     private ForecastViewAdapter mForecastViewAdapter;
     private String timeZoneId;
+    private List<WeatherModel> mThreeHours;
     public WeatherFragment() {
 
     }
 
-    public static WeatherFragment newInstance(List<WeatherModel> fiveDaysForecastList, WeatherModel today){
+    public static WeatherFragment newInstance(List<WeatherModel> fiveDaysForecastList, WeatherModel today, List<WeatherModel> threehours){
         WeatherFragment fragment = new WeatherFragment();
         fragment.mFiveDaysForecastList = fiveDaysForecastList;
         fragment.today = today;
         fragment.timeZoneId = today.timeZoneId;
+        fragment.mThreeHours = threehours;
         return fragment;
     }
 
@@ -54,6 +58,7 @@ public class WeatherFragment extends Fragment {
         setBackgroundColor(today);
         setTodayView(today);
         setForecastView(mFiveDaysForecastList);
+        setThreeHoursView(mThreeHours);
         return v;
     }
 
@@ -73,6 +78,17 @@ public class WeatherFragment extends Fragment {
 
     }
 
+    // set here
+    private void setThreeHoursView(final List<WeatherModel> threeHours){
+        if(v==null || threeHours == null){
+            return;
+        }
+
+
+
+
+    }
+
     private void setBackgroundColor(WeatherModel weatherModel){
         if(weatherModel == null || v == null){
             return;
@@ -89,15 +105,7 @@ public class WeatherFragment extends Fragment {
         if(weatherModel == null || v == null){
             return;
         }
-
-        /*
-        Address address = WeatherApp.getAddressHere();
-        if(weatherModel.isMyLocation(address)){
-            Logger.d(TAG, "true");
-            TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
-            geoLocation.setVisibility(View.VISIBLE);
-            geoLocation.setText("You are here");
-        }*/
+        new LocationAsyncTask().execute(weatherModel);
 
         Formatter formatter = new Formatter();
 
@@ -154,4 +162,25 @@ public class WeatherFragment extends Fragment {
 
     }
 
+    private class LocationAsyncTask extends AsyncTask<WeatherModel, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(WeatherModel... weatherModels) {
+
+            WeatherModel weatherModel = weatherModels[0];
+
+            Address address = WeatherApp.getAddressHere();
+            return (weatherModel.isMyLocation(address));
+        }
+
+        protected void onPostExecute(Boolean result) {
+
+            if(result){
+                TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
+                geoLocation.setVisibility(View.VISIBLE);
+                geoLocation.setText("You are here");
+            }
+
+        }
+    }
 }

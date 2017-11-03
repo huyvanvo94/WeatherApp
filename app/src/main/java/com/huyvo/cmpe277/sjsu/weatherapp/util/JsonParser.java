@@ -38,7 +38,6 @@ public class JsonParser {
             weatherModel.icon = JsonHelper.getString(weatherArray, 0, "icon");
 
             weatherModels.add(weatherModel);
-
         }
 
         return weatherModels;

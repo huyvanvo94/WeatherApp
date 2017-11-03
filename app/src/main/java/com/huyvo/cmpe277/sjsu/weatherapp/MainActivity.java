@@ -18,6 +18,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchThreeHoursIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today.FetchTodayWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
@@ -134,14 +135,20 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
 
     @Override
     protected void fetchForecastWeather(String location) {
-
-        Intent intent = new Intent(MainActivity.this, UpdateForecastIntentService.class);
+        Intent intent = new Intent(this, UpdateForecastIntentService.class);
         intent.putExtra(UpdateForecastIntentService.WHO, new Messenger(mHandler));
         intent.putExtra(UpdateForecastIntentService.FETCH_FORECAST, location);
         startService(intent);
     }
 
+    @Override
+    protected void fetchThreeHours(String location) {
+        Intent i = new Intent(this, FetchThreeHoursIntentService.class);
+        i.putExtra(FetchThreeHoursIntentService.FETCH_THREE_HOURS, location);
+        i.putExtra(FetchThreeHoursIntentService.WHO, new Messenger(mHandler));
+        startService(i);
 
+    }
     @Override
     public void onPageScrollStateChanged(int state) {
 
@@ -192,10 +199,7 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         }
     }
 
-    @Override
-    protected void fetchThreeHours(String location) {
 
-    }
 
     private class LoadAllDataRunnable implements Runnable, PostFinishedListener, Postable {
         private Queue<String> mLocations;
@@ -227,9 +231,13 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
                     TodayWeatherContainer todayWeatherContainer = TodayWeatherContainer.getInstance();
                     WeatherModel weatherModel = todayWeatherContainer.getWeatherModel(location);
 
-                    LoadingPair loadingPair = new LoadingPair();
-                    loadingPair.mModels = weatherModels;
-                    loadingPair.model = weatherModel;
+                    ThreeHourWeatherContainer threeHourWeatherContainer = ThreeHourWeatherContainer.getInstance();
+                    List<WeatherModel> threehoursModels = threeHourWeatherContainer.getWeatherModels(location);
+
+                    LoadDataInfo loadingPair = new LoadDataInfo();
+                    loadingPair.fiveDayModels = weatherModels;
+                    loadingPair.todayModel = weatherModel;
+                    loadingPair.threehoursModels = threehoursModels;
 
                     Message message = mHandler.obtainMessage();
                     message.obj = loadingPair;
@@ -288,7 +296,7 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
                 default:
                     if( msg.obj != null) {
 
-                        int length = addToAdapter((LoadingPair) msg.obj);
+                        int length = addToAdapter((LoadDataInfo) msg.obj);
                         postFinishedListener.done();
                         if (length - 1 == postFinishedListener.getPosition()) {
                             new LoadPageAsync().execute();
@@ -307,10 +315,10 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         wpa.notifyDataSetChanged();
 
     }
-    public int addToAdapter(LoadingPair loadingPair){
+    public int addToAdapter(LoadDataInfo info){
         ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
-        wpa.add(WeatherFragment.newInstance(loadingPair.mModels, loadingPair.model));
+        wpa.add(WeatherFragment.newInstance(info.fiveDayModels, info.todayModel, info.threehoursModels));
         return wpa.getCount();
     }
     public boolean updateForecastView(int position, List<WeatherModel> weatherModels){
@@ -350,9 +358,10 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         return wpa.getCount();
     }
 
-    class LoadingPair{
-        public List<WeatherModel> mModels;
-        public WeatherModel model;
+    class LoadDataInfo {
+        public List<WeatherModel> fiveDayModels;
+        public WeatherModel todayModel;
+        public List<WeatherModel> threehoursModels;
     }
 
     class ForecastInfo{

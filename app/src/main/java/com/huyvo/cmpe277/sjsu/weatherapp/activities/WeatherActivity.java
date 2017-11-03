@@ -23,6 +23,12 @@ public abstract class WeatherActivity extends AppCompatActivity{
         fetchForecastWeather(location);
     }
 
+    protected void load(){
+        onLoadUI();
+        onLoadData();
+        onFetchPeriodically();
+    }
+
     public void showFragment(int containerResId, Fragment fragment){
         showFragment(containerResId, fragment, false, false);
     }

@@ -50,7 +50,7 @@ public class OpenWeatherDataService implements DataService{
     public void getWeatherThreeHoursLatLng(String location, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
         String url = "http://api.openweathermap.org/data/2.5/forecast?"
                 +location+
-                "&mode=json&units=imperial&cnt=2&appid=b54f500d4a53fdfc96813a4ba9210417";
+                "&mode=json&units=imperial&cnt=8&appid=b54f500d4a53fdfc96813a4ba9210417";
 
         Logger.d(TAG, "get weather three hours: " + url);
         VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {

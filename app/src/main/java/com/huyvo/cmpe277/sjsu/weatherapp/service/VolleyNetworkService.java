@@ -24,11 +24,8 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
 
     private final RequestQueue mfRequestQueue;
 
-    private static VolleyNetworkService instance;
+    private static VolleyNetworkService instance = new VolleyNetworkService();
 
-    static {
-        instance = new VolleyNetworkService();
-    }
 
 
     private VolleyNetworkService(){
