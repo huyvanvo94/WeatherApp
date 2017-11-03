@@ -1,4 +1,4 @@
-package com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today;
+package com.huyvo.cmpe277.sjsu.weatherapp.service.intent;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.TimeZoneContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.TodayWeatherContainer;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.LocalTimeModel;
@@ -17,6 +18,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.service.FutureTaskListener;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.GooglePlaceService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.PlaceService;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 /**
  * Created by Huy Vo on 10/29/17.
@@ -38,9 +40,9 @@ public class FetchTodayWeatherIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable final Intent intent) {
+        Logger.d(TAG, "onHandleIntent");
         final Bundle bundle = intent.getExtras();
         if (bundle != null) {
-
             final String location = intent.getStringExtra(FETCH_WEATHER);
 
             if(location != null){
@@ -50,29 +52,30 @@ public class FetchTodayWeatherIntentService extends IntentService {
                     public void onCompletion(final WeatherModel result) {
 
                         PlaceService placeService = new GooglePlaceService();
-                        placeService.getLocalTime(result.lat+","+result.lon, new FutureTaskListener<LocalTimeModel>() {
+                        placeService.getLocalTime(result.timeLocationFormat(), new FutureTaskListener<LocalTimeModel>() {
                             @Override
                             public void onCompletion(LocalTimeModel resultLocalTime) {
                                 result.location = location;
                                 result.city = WeatherApp.findCity(result.location);
                                 result.timeZoneId = resultLocalTime.timeZoneId;
 
-                                String city = intent.getStringExtra(CITY);
-                                if(city != null) {
-                                    result.city = city;
-                                }
-
                                 TodayWeatherContainer todayWeatherContainer = TodayWeatherContainer.getInstance();
                                 todayWeatherContainer.put(location, result);
+                                TimeZoneContainer.getInstance().put(location, resultLocalTime.timeZoneId);
 
-                                Messenger messenger = (Messenger) bundle.get(WHO);
-                                Message msg = Message.obtain();
-                                Bundle b = intent.getExtras();
-                                b.putString(FETCH_WEATHER, location);
-                                msg.setData(b);
+
                                 try {
-                                    messenger.send(msg);
-                                } catch (RemoteException e) {}
+                                    Messenger messenger = (Messenger) bundle.get(WHO);
+                                    Message msg = Message.obtain();
+
+                                    bundle.putString(FETCH_WEATHER, location);
+                                    msg.setData(bundle);
+                                    if (messenger != null) {
+                                        messenger.send(msg);
+                                    }
+                                } catch (RemoteException e) {
+                                    Logger.e(TAG, "Error");
+                                }
                             }
 
                             @Override

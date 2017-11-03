@@ -1,5 +1,6 @@
 package com.huyvo.cmpe277.sjsu.weatherapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,13 +15,13 @@ import android.view.MenuItem;
 
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.CityListViewActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.SettingsActivity;
-import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherActivity;
+import com.huyvo.cmpe277.sjsu.weatherapp.activities.BaseWeatherActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherPageAdapter;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchThreeHoursIntentService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.today.FetchTodayWeatherIntentService;
+import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchTodayWeatherIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
 import java.util.LinkedList;
@@ -32,7 +33,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE;
 import static com.huyvo.cmpe277.sjsu.weatherapp.util.Constants.MainViewMessages.UPDATE_FORECAST;
 
-public class MainActivity extends WeatherActivity implements ViewPager.OnPageChangeListener{
+public class MainActivity extends BaseWeatherActivity implements ViewPager.OnPageChangeListener{
 
     public final static String TAG = "MainActivity";
 
@@ -118,8 +119,8 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
                 public void run() {
                     Logger.d(TAG, position+"");
                     String location = WeatherApp.getLatLngList().get(position);
-                    fetchTodayWeather(location);
-                    fetchForecastWeather(location);
+
+                    fetchData(location);
                 }
             }).start();
         }
@@ -135,9 +136,9 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
 
     @Override
     protected void fetchForecastWeather(String location) {
-        Intent intent = new Intent(this, UpdateForecastIntentService.class);
-        intent.putExtra(UpdateForecastIntentService.WHO, new Messenger(mHandler));
-        intent.putExtra(UpdateForecastIntentService.FETCH_FORECAST, location);
+        Intent intent = new Intent(this, FetchForecastIntentService.class);
+        intent.putExtra(FetchForecastIntentService.WHO, new Messenger(mHandler));
+        intent.putExtra(FetchForecastIntentService.FETCH_WEATHER, location);
         startService(intent);
     }
 
@@ -261,17 +262,25 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         int getPosition();
     }
 
+    @SuppressLint("HandlerLeak")
     Handler mHandler = new Handler(){
         public void handleMessage(Message msg) {
             Bundle reply = msg.getData();
             if(reply != null){
-                String location = reply.getString(UpdateForecastIntentService.FETCH_FORECAST, null);
+                /**
+                 * Post Forecast Data
+                 */
+                String location = reply.getString(FetchForecastIntentService.FETCH_WEATHER, null);
                 if(location != null){
                     List<WeatherModel> models = WeatherForecastContainer.getInstance().getWeatherModels(location);
                     int position = WeatherApp.getLatLngList().indexOf(location);
                     updateForecastView(position, models);
                     return;
                 }
+
+                /**
+                 * Post Today's Weather Data
+                 */
 
                 location = reply.getString(FetchTodayWeatherIntentService.FETCH_WEATHER, null);
                 if(location != null){
@@ -281,6 +290,17 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
 
                     return;
                 }
+                /**
+                 * Post Three Hours Data
+                 */
+                location = reply.getString(FetchThreeHoursIntentService.FETCH_THREE_HOURS, null);
+                if(location != null){
+                    List<WeatherModel> models = ThreeHourWeatherContainer.getInstance().getWeatherModels(location);
+                    int position = WeatherApp.getLatLngList().indexOf(location);
+                    updateThreeHours(position, models);
+                    return;
+                }
+
             }
 
 
@@ -320,6 +340,22 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
         wpa.add(WeatherFragment.newInstance(info.fiveDayModels, info.todayModel, info.threehoursModels));
         return wpa.getCount();
+    }
+
+    public boolean updateThreeHours(int position, List<WeatherModel> weatherModels){
+        Logger.d(TAG, "updateThreeHours");
+        ViewPager vp = (ViewPager) findViewById(R.id.city_viewpager);
+        WeatherPageAdapter wpa = (WeatherPageAdapter) vp.getAdapter();
+
+        if(position >= wpa.getCount()){
+            return false;
+        }
+        WeatherFragment fragment = (WeatherFragment) wpa.getItem(position);
+        if(fragment == null){
+            return false;
+        }
+        fragment.setThreeHoursView(weatherModels);
+        return true;
     }
     public boolean updateForecastView(int position, List<WeatherModel> weatherModels){
         Logger.d(TAG, "updateForecastView");
@@ -369,7 +405,7 @@ public class MainActivity extends WeatherActivity implements ViewPager.OnPageCha
         public List<WeatherModel> mList;
     }
 
-    class LoadPageAsync extends AsyncTask<Void, Void, Void>{
+    private class LoadPageAsync extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {

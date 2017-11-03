@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class FetchThreeHoursIntentService extends IntentService {
     public final static String TAG = FetchThreeHoursIntentService.class.getSimpleName();
-    public final static String FETCH_THREE_HOURS = "com.huyvo.fetch";
+    public final static String FETCH_THREE_HOURS = "com.huyvo.fetchData";
     public final static String WHO = "com.huyvo.who";
 
     public FetchThreeHoursIntentService(){
@@ -39,8 +39,7 @@ public class FetchThreeHoursIntentService extends IntentService {
             DataService service = new OpenWeatherDataService();
             service.getWeatherThreeHoursLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
                 @Override
-                public void onCompletion(ArrayList<WeatherModel> result) {
-
+                public void onCompletion(final ArrayList<WeatherModel> result) {
                     ThreeHourWeatherContainer container = ThreeHourWeatherContainer.getInstance();
                     container.put(location, result);
 
@@ -57,6 +56,7 @@ public class FetchThreeHoursIntentService extends IntentService {
 
                         }
                     }
+
                 }
 
                 @Override

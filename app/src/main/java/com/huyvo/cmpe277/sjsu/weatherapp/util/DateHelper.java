@@ -43,6 +43,10 @@ public class DateHelper {
 
     }
 
+    public static String getLocalDay(long unixTime, String timeZoneId){
+       return DateHelper.getDate(unixTime, timeZoneId, "EEE");
+    }
+
 
     public static String getDate(long unixTime, String gmtTime, String dateFormat) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);

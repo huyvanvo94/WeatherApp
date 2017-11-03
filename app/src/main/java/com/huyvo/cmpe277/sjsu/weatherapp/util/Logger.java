@@ -2,6 +2,7 @@ package com.huyvo.cmpe277.sjsu.weatherapp.util;
 
 import android.util.Log;
 
+import com.huyvo.cmpe277.sjsu.weatherapp.service.GooglePlaceService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.FetchForecastIntentService;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherForecastContainer;
@@ -10,7 +11,6 @@ import com.huyvo.cmpe277.sjsu.weatherapp.MainActivity;
 import com.huyvo.cmpe277.sjsu.weatherapp.activities.WeatherFragment;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.OpenWeatherDataService;
 import com.huyvo.cmpe277.sjsu.weatherapp.service.VolleyNetworkService;
-import com.huyvo.cmpe277.sjsu.weatherapp.service.intent.UpdateForecastIntentService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ public final class Logger {
             FetchForecastIntentService.TAG,
             OpenWeatherDataService.TAG,
             VolleyNetworkService.TAG,
-            UpdateForecastIntentService.TAG
+            GooglePlaceService.TAG
     );
 
     public static synchronized void d(String tag, String msg) {

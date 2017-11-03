@@ -3,9 +3,9 @@ package com.huyvo.cmpe277.sjsu.weatherapp.activities;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.huyvo.cmpe277.sjsu.weatherapp.R;
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.model.WeatherModel;
+import com.huyvo.cmpe277.sjsu.weatherapp.util.DateHelper;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Formatter;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
@@ -26,19 +27,19 @@ public class WeatherFragment extends Fragment {
 
     private View v;
     private WeatherModel today;
-    private List<WeatherModel> mFiveDaysForecastList;
-    private String timeZoneId;
+    private List<WeatherModel> mForecastList;
     private List<WeatherModel> mThreeHours;
+    private String mTimeZoneId;
     public WeatherFragment() {
 
     }
 
-    public static WeatherFragment newInstance(List<WeatherModel> fiveDaysForecastList, WeatherModel today, List<WeatherModel> threehours){
+    public static WeatherFragment newInstance(List<WeatherModel> forcastList, WeatherModel today, List<WeatherModel> threehours){
         WeatherFragment fragment = new WeatherFragment();
-        fragment.mFiveDaysForecastList = fiveDaysForecastList;
+        fragment.mForecastList = forcastList;
         fragment.today = today;
-        fragment.timeZoneId = today.timeZoneId;
         fragment.mThreeHours = threehours;
+        fragment.mTimeZoneId = today.timeZoneId;
         return fragment;
     }
 
@@ -56,7 +57,7 @@ public class WeatherFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_weather, container, false);
         setBackgroundColor(today);
         setTodayView(today);
-        setForecastView(mFiveDaysForecastList);
+        setForecastView(mForecastList);
         setThreeHoursView(mThreeHours);
         return v;
     }
@@ -78,13 +79,24 @@ public class WeatherFragment extends Fragment {
     }
 
     // set here
-    private void setThreeHoursView(final List<WeatherModel> threeHours){
-        if(v==null || threeHours == null){
+    public void setThreeHoursView(final List<WeatherModel> threeHours){
+        if(v == null || threeHours == null){
             return;
         }
 
-        ThreeHoursViewAdapter threeHoursViewAdapter = new ThreeHoursViewAdapter(getContext(), mThreeHours, timeZoneId);
+        ThreeHoursViewAdapter threeHoursViewAdapter = new ThreeHoursViewAdapter(getContext(), mThreeHours, mTimeZoneId);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (WeatherModel weatherModel: threeHours){
+
+                    weatherModel.timeZoneId = mTimeZoneId;
+                    Log.d("OK", weatherModel.getDateWithTimeZone()
+                            + " " + weatherModel.getDateWithTimeZone() + " " + weatherModel.getFutureTime() + " " + weatherModel.icon);
+                }
+            }
+        }).start();
 
     }
 
@@ -100,11 +112,28 @@ public class WeatherFragment extends Fragment {
 
     }
  
-    public void setTodayView(WeatherModel weatherModel){
+    public void setTodayView(final WeatherModel weatherModel){
         if(weatherModel == null || v == null){
             return;
         }
-        new LocationAsyncTask().execute(weatherModel);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Address address = WeatherApp.getAddressHere();
+                if(address != null){
+                    if(weatherModel.isMyLocation(address)) {
+                        final TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
+                        geoLocation.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                geoLocation.setVisibility(View.VISIBLE);
+                                geoLocation.setText(R.string.current_location);
+                            }
+                        });
+                    }
+                }
+            }
+        }).start();
 
         Formatter formatter = new Formatter();
 
@@ -148,38 +177,24 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public void setForecastView(List<WeatherModel> fiveDaysForecastList){
-        Logger.d(TAG, "setForecastView" + String.valueOf(v==null));
+    public void setForecastView(List<WeatherModel> forecastList){
+        Logger.d(TAG, "setForecastView " + String.valueOf(v==null));
 
-        if(fiveDaysForecastList == null || v == null){
+        if(forecastList == null || v == null){
             return;
         }
 
-        ForecastViewAdapter mForecastViewAdapter = new ForecastViewAdapter(getContext(), fiveDaysForecastList, timeZoneId);
+        if(forecastList.size() != 5) {
+            if (DateHelper.numberOfDayFromToday(forecastList.get(0).dt, mTimeZoneId) < 1) {
+                forecastList.remove(0);
+            } else {
+                forecastList.remove(forecastList.size() - 1);
+            }
+        }
+        ForecastViewAdapter mForecastViewAdapter = new ForecastViewAdapter(getContext(), forecastList, mTimeZoneId);
         ListView forecastListView = (ListView) v.findViewById(R.id.forecast_list);
         forecastListView.setAdapter(mForecastViewAdapter);
 
     }
 
-    private class LocationAsyncTask extends AsyncTask<WeatherModel, Void, Boolean>{
-
-        @Override
-        protected Boolean doInBackground(WeatherModel... weatherModels) {
-
-            WeatherModel weatherModel = weatherModels[0];
-
-            Address address = WeatherApp.getAddressHere();
-            return (weatherModel.isMyLocation(address));
-        }
-
-        protected void onPostExecute(Boolean result) {
-
-            if(result){
-                TextView geoLocation = (TextView) v.findViewById(R.id.text_view_geo_location);
-                geoLocation.setVisibility(View.VISIBLE);
-                geoLocation.setText("You are here");
-            }
-
-        }
-    }
 }

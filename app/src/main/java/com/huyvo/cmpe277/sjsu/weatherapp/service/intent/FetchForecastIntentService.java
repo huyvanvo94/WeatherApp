@@ -22,9 +22,7 @@ import java.util.ArrayList;
  */
 
 public class FetchForecastIntentService extends IntentService {
-
     public final static String TAG = "FetchForecastIntentService";
-
     public final static String WHO = "com.huyvo.cmpe277.weatherapp.who";
     public final static String FETCH_WEATHER = "com.huyvo.cmpe277.weatherapp.fetch_weather";
 
@@ -39,27 +37,46 @@ public class FetchForecastIntentService extends IntentService {
     protected void onHandleIntent(@Nullable final Intent intent) {
         Logger.d(TAG, "onHandleIntent");
         final String location = intent.getStringExtra(FETCH_WEATHER);
+        final Bundle bundle = intent.getExtras();
 
         if(location != null){
+
             DataService service = new OpenWeatherDataService();
             service.getForecastByLatLng(location, new FutureTaskListener<ArrayList<WeatherModel>>() {
                 @Override
                 public void onCompletion(final ArrayList<WeatherModel> results) {
                     if(results != null){
+
+                        /**
+                        String timeZoneId = TimeZoneContainer.getInstance().getTimeZoneId(location);
+
+                        Log.d("OK", timeZoneId);
+
+                        String timeZoneId = result.timeZoneId;
+
+                        if(DateHelper.numberOfDayFromToday(results.get(0).dt, timeZoneId) < 1){
+                            results.remove(0);
+                        }else{
+                            results.remove(results.size()-1);
+                        }
+
+                        for(WeatherModel model: results){
+                            model.timeZoneId = timeZoneId;
+                        }
+
+
+                         */
                         WeatherForecastContainer.getInstance().put(location, results);
-
-                        Bundle bundle = intent.getExtras();
-                        final Messenger messenger = (Messenger) bundle.get(WHO);
-                        if(messenger != null) {
-                            final Message msg = Message.obtain();
-                            Bundle b = intent.getExtras();
-                            b.putString(FETCH_WEATHER, location);
-                            msg.setData(b);
-                            try {
+                        try {
+                            Messenger messenger = (Messenger) bundle.get(WHO);
+                            Message msg = Message.obtain();
+                            bundle.putString(FETCH_WEATHER, location);
+                            msg.setData(bundle);
+                            if (messenger != null) {
                                 messenger.send(msg);
-                            } catch (RemoteException e) {
-
                             }
+                        } catch (RemoteException e) {
+                            Logger.e(TAG, "Error");
                         }
 
                     }

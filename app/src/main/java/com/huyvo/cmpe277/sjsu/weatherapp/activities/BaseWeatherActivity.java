@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
  * Created by Huy Vo on 9/16/17.
  */
 
-public abstract class WeatherActivity extends AppCompatActivity{
+public abstract class BaseWeatherActivity extends AppCompatActivity{
     protected abstract void onLoadUI();
     protected abstract void onFetchPeriodically();
     protected abstract void onLoadData();
@@ -17,10 +17,10 @@ public abstract class WeatherActivity extends AppCompatActivity{
     protected abstract void fetchTodayWeather(String location);
     protected abstract void fetchForecastWeather(String location);
 
-    protected void fetch(String location){
-        fetchThreeHours(location);
+    protected void fetchData(String location){
         fetchTodayWeather(location);
         fetchForecastWeather(location);
+        fetchThreeHours(location);
     }
 
     protected void load(){

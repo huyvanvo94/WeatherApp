@@ -15,6 +15,8 @@ public class WeatherForecastContainer {
     private static WeatherForecastContainer instance;
     public final static long REQUEST_WEATHER_FIVE_MINUTES = 300000;
 
+    public final static long REQUEST_WEATH_30_MINS = REQUEST_WEATHER_FIVE_MINUTES*6;
+
     private HashMap<String, WeatherForecastPackage> mfHashMap;
 
     private WeatherForecastContainer(){
@@ -53,7 +55,7 @@ public class WeatherForecastContainer {
 
         long timestamp = mfHashMap.get(location).mTimestamp;
 
-        if(System.currentTimeMillis() - timestamp >= REQUEST_WEATHER_FIVE_MINUTES){
+        if(System.currentTimeMillis() - timestamp >= REQUEST_WEATH_30_MINS){
             return true;
         }
 

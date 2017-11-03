@@ -80,6 +80,10 @@ public class LocationService implements LocationListener {
     }
 
     public Address getAddress(Location location){
+        if(location == null){
+            return null;
+        }
+
         return getAddress(location.getLatitude(), location.getLongitude());
     }
 

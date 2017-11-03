@@ -18,14 +18,24 @@ public class JsonParser {
 
     public static ArrayList<WeatherModel> parseThreeHourWeather(String jsonObjectString){
 
+        JSONObject json = createJSONObject(jsonObjectString);
+
         ArrayList<WeatherModel> weatherModels = new ArrayList<>();
-        JSONArray weatherJsonArray = JsonHelper.getJSONArray(createJSONObject(jsonObjectString), "list");
+        JSONArray weatherJsonArray = JsonHelper.getJSONArray(json, "list");
         int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
+
+        JSONObject cityObject = JsonHelper.getJSONObject(json, "city");
+
+        JSONObject coorObjec = JsonHelper.getJSONObject(cityObject, "coord");
+        double lon = JsonHelper.getDouble(coorObjec, "lon");
+        double lat = JsonHelper.getDouble(coorObjec, "lat");
 
         for(int i = 0; i < length; i++){
             WeatherModel weatherModel = new WeatherModel();
             JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
+            weatherModel.lat = lat;
+            weatherModel.lon = lon;
 
             JSONObject mainObject = JsonHelper.getJSONObject(jsonObject, "main");
             weatherModel.temp_max = (float) JsonHelper.getDouble(mainObject, "temp_max");
@@ -107,13 +117,14 @@ public class JsonParser {
         JSONArray weatherJsonArray = JsonHelper.getJSONArray(createJSONObject(jsonObjectString), "list");
         int length = weatherJsonArray == null ? 0 : weatherJsonArray.length();
 
+        //String timeZoneId = TodayWeatherContainer.getInstance().getWeatherModel(WeatherModel)
+
         for (int i = 1; i < length; i++) {
             WeatherModel weatherModel = new WeatherModel();
             JSONObject jsonObject = weatherJsonArray.optJSONObject(i);
             weatherModel.dt = JsonHelper.getLong(jsonObject, "dt");
             weatherModel.lat = lat;
             weatherModel.lon = lon;
-
 
             weatherModel.country = country;
             weatherModel.city = city;

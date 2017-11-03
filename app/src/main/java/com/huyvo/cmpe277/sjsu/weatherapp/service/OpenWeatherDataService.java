@@ -17,7 +17,7 @@ public class OpenWeatherDataService implements DataService{
     public OpenWeatherDataService(){
     }
 
-    /*Can fetch weather using imperial or metric*/
+    /*Can fetchData weather using imperial or metric*/
     @Override
     public void getWeatherByLatLng(String location,final FutureTaskListener<WeatherModel> listener) {
         String url = "http://api.openweathermap.org/data/2.5/weather?"+location+"&units=imperial&appid=b54f500d4a53fdfc96813a4ba9210417";
@@ -81,7 +81,7 @@ public class OpenWeatherDataService implements DataService{
     @Override
     public void getForecastByLatLng(String latLng, final FutureTaskListener<ArrayList<WeatherModel>> listener) {
 
-        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=6&appid="+"b54f500d4a53fdfc96813a4ba9210417";
+        String url = "http://api.openweathermap.org/data/2.5/forecast/daily?"+latLng+"&mode=json&units=imperial&cnt=7&appid="+"b54f500d4a53fdfc96813a4ba9210417";
         Logger.d(TAG, "getForecast: "+url );
         VolleyNetworkService.getInstance().getString(url, "OpenWeatherDataService", new FutureTaskListener<String>() {
             @Override
@@ -105,8 +105,5 @@ public class OpenWeatherDataService implements DataService{
 
             }
         });
-
     }
-
-
 }

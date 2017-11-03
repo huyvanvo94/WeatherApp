@@ -38,6 +38,14 @@ public class WeatherModel implements BaseModel {
 
     public String timeZoneId;
 
+    public String timeLocationFormat(){
+        return lat+","+lon;
+    }
+
+    public String getLocationFormat(){
+        return "lat="+lat+"&lon="+lon;
+    }
+
     public String getKey(){
         String lat = String.format("%.2f", this.lat);
         String lon = String.format("%.2f", this.lon);

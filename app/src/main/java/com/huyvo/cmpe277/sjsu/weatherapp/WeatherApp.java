@@ -31,8 +31,6 @@ public class WeatherApp extends Application {
         mApplication = this;
         mLatLngList = new ArrayList<>();
         mCityList = new ArrayList<>();
-        preferenceManager = new PreferenceManager(getApplicationContext());
-
         VolleyNetworkService.getInstance();
         preferenceManager = new PreferenceManager(getApplicationContext());
         int unit = preferenceManager.getInt(PreferenceManager.KeyValue.UNIT_KEY);

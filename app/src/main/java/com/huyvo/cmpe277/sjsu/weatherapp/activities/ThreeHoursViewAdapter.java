@@ -12,11 +12,11 @@ import java.util.List;
  */
 
 public class ThreeHoursViewAdapter extends ArrayAdapter<WeatherModel> {
-
-    private String mTimeZoneId;
+  private String mTimeZoneId;
 
     public ThreeHoursViewAdapter(Context context, List<WeatherModel> objects, String timeZoneId){
         super(context, 0, objects);
+
         mTimeZoneId = timeZoneId;
     }
 }

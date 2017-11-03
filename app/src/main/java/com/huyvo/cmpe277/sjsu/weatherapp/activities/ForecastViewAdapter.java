@@ -20,11 +20,11 @@ import java.util.List;
 
 public class ForecastViewAdapter extends ArrayAdapter<WeatherModel> {
 
+
     private String mTimeZoneId;
-
-
     public ForecastViewAdapter(Context context, List<WeatherModel> objects, String timeZoneId) {
         super(context, 0, objects);
+
         mTimeZoneId = timeZoneId;
     }
 
@@ -32,12 +32,13 @@ public class ForecastViewAdapter extends ArrayAdapter<WeatherModel> {
     public View getView(int position, View convertView, ViewGroup parent){
 
         WeatherModel weatherModel = getItem(position);
+        weatherModel.timeZoneId = mTimeZoneId;
         Formatter formatter = new Formatter();
         if(convertView == null){
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_forecast_view, parent, false);
         }
 
-        weatherModel.timeZoneId = mTimeZoneId;
+
 
         TextView dayTextView = (TextView) convertView.findViewById(R.id.text_view_day);
         TextView dayTempTextView = (TextView) convertView.findViewById(R.id.text_view_day_temp);
