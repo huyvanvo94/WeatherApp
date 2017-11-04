@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,8 +85,14 @@ public class WeatherFragment extends Fragment {
         if(v == null || threeHours == null){
             return;
         }
-
+        RecyclerView rvThreeHours = (RecyclerView) v.findViewById(R.id.threehours_recycler_view);
         ThreeHoursViewAdapter threeHoursViewAdapter = new ThreeHoursViewAdapter(getContext(), mThreeHours, mTimeZoneId);
+        rvThreeHours.setAdapter(threeHoursViewAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvThreeHours.setLayoutManager(layoutManager);
+        rvThreeHours.setHasFixedSize(true);
+        rvThreeHours.scrollToPosition(0);
+
 
         new Thread(new Runnable() {
             @Override

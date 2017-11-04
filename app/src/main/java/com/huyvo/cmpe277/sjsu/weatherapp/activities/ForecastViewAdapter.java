@@ -102,6 +102,8 @@ public class ForecastViewAdapter extends ArrayAdapter<WeatherModel> {
                 icon_mist.setBounds(0, 0, 150, 150);
                 dayTempTextView.setCompoundDrawables(icon_mist, null, null, null);
                 break;
+            default:
+                break;
         }
     }
 
