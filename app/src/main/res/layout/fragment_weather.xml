@@ -18,7 +18,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.2"
+            android:layout_weight="0.1"
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/textview_city_name"
@@ -26,7 +26,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:textColor="@color/white"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:text="CITY NAME"
                 android:paddingTop="5dp"
                 android:gravity="center"/>
@@ -38,7 +38,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:textColor="@color/white"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:paddingTop="5dp"
                 android:text="DATE"/>
         </LinearLayout>
@@ -51,7 +51,7 @@
             android:layout_height="0dp"
             android:textColor="@color/white"
             android:textSize="75sp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.3"
             android:text="TEMP"
             android:gravity="bottom|center_horizontal"
             />
@@ -69,7 +69,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.2"
+            android:layout_weight="0.1"
             android:orientation="horizontal"
             >
             <TextView
@@ -140,15 +140,33 @@
             android:id="@+id/text_view_geo_location"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.05"
             android:gravity="center"
             android:text="geolocation"
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="italic"
-            android:visibility="invisible" />
+            android:visibility="invisible"/>
 
 
+
+    </LinearLayout>
+
+    <!-- Layout for three hours RelativeLayout child -->
+    <LinearLayout
+        android:id="@+id/threehours_layout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/details_layout"
+        android:background="@drawable/background_three_hours">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/threehours_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
 
@@ -158,7 +176,7 @@
         android:id="@+id/forecast_layout"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_below="@+id/details_layout"
+        android:layout_below="@+id/threehours_layout"
         android:layout_alignParentBottom="true">
 
         <ListView
