@@ -128,6 +128,9 @@ public class ThreeHoursViewAdapter extends RecyclerView.Adapter<ThreeHoursViewAd
                 dayTempTextView.setCompoundDrawables(null, icon_mist, null, null);
                 break;
             default:
+                Drawable icon_unknown = getContext().getDrawable(R.drawable.icon_unknown);
+                icon_unknown.setBounds(0, 0, 135, 135);
+                dayTempTextView.setCompoundDrawables(null, icon_unknown, null, null);
                 break;
         }
     }
