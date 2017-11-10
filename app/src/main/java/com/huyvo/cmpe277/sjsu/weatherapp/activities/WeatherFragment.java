@@ -93,19 +93,6 @@ public class WeatherFragment extends Fragment {
         rvThreeHours.setHasFixedSize(true);
         rvThreeHours.scrollToPosition(0);
 
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (WeatherModel weatherModel: threeHours){
-
-                    weatherModel.timeZoneId = mTimeZoneId;
-                    Log.d("OK", weatherModel.getDateWithTimeZone()
-                            + " " + weatherModel.getDateWithTimeZone() + " " + weatherModel.getFutureTime() + " " + weatherModel.icon);
-                }
-            }
-        }).start();
-
     }
 
     private void setBackgroundColor(WeatherModel weatherModel){
