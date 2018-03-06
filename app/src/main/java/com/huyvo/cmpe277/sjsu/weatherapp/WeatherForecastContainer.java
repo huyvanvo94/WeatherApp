@@ -12,7 +12,7 @@ import java.util.List;
 public class WeatherForecastContainer {
     public final static String TAG = "WeatherForecastContainer";
 
-    private static WeatherForecastContainer instance;
+    private volatile static WeatherForecastContainer instance;
     public final static long REQUEST_WEATHER_FIVE_MINUTES = 300000;
 
     public final static long REQUEST_WEATH_30_MINS = REQUEST_WEATHER_FIVE_MINUTES*6;
