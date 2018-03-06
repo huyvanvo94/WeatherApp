@@ -17,15 +17,17 @@ public class WeatherForecastContainer {
 
     public final static long REQUEST_WEATH_30_MINS = REQUEST_WEATHER_FIVE_MINUTES*6;
 
-    private HashMap<String, WeatherForecastPackage> mfHashMap;
+    private HashMap<String, WeatherForecastPackage> mfHashMap = new HashMap<>(); 
 
-    private WeatherForecastContainer(){
-        mfHashMap = new HashMap<>();
-    }
+    private WeatherForecastContainer(){}
 
-    public static synchronized WeatherForecastContainer getInstance(){
+    public static WeatherForecastContainer getInstance(){
         if(instance == null){
-            instance = new WeatherForecastContainer();
+            synchronized( WeatherForecastContainer.class){
+                if(instance == null){
+                    instance = new WeatherForecastContainer();
+                }
+            }
         }
 
         return instance;
