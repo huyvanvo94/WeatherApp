@@ -7,7 +7,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.huyvo.cmpe277.sjsu.weatherapp.Singleton;
+
 import com.huyvo.cmpe277.sjsu.weatherapp.WeatherApp;
 import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
 
@@ -15,7 +15,7 @@ import com.huyvo.cmpe277.sjsu.weatherapp.util.Logger;
  * Created by Huy Vo on 10/22/17.
  */
 
-public class VolleyNetworkService extends Singleton implements NetworkService {
+public class VolleyNetworkService implements NetworkService {
 
     public final static String TAG = VolleyNetworkService.class.getSimpleName();
 
@@ -57,10 +57,7 @@ public class VolleyNetworkService extends Singleton implements NetworkService {
         startRequest(stringRequest, tag);
     }
 
-    @Override
-    protected void shutdown() {
 
-    }
 
     private void startRequest(Request request, String tag){
         request.setRetryPolicy(new DefaultRetryPolicy(VOLLEY_TIME_OUT, NUMBER_OF_RETRY, 0));
